@@ -1,0 +1,11 @@
+<!-- CampusCart mark — master source for every rendered icon size.
+     Self-contained (no CSS vars) so sharp can rasterise it directly. -->
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="112" fill="#0A0A0B"/>
+  <g transform="translate(96 96) scale(10)" stroke="#FAFAFA" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 6h3.2a2 2 0 0 1 1.94 1.51L9.6 9.5"/>
+    <path d="M9.6 9.5h16.2a1.6 1.6 0 0 1 1.56 1.96l-1.72 7.4a3.2 3.2 0 0 1-3.12 2.48H13.3a3.2 3.2 0 0 1-3.13-2.55L8.1 8.9"/>
+  </g>
+  <circle cx="230" cy="356" r="21" fill="#FAFAFA"/>
+  <circle cx="330" cy="356" r="21" fill="#FAFAFA"/>
+</svg>

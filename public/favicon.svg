@@ -1,0 +1,11 @@
+<!-- Tighter geometry than the app icon: at 16px the handle and wheels read as
+     noise, so the favicon keeps the basket silhouette and one wheel pair. -->
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="7" fill="#0A0A0B"/>
+  <g stroke="#FAFAFA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 9h2.2l.7 2"/>
+    <path d="M9.9 11h13.4a1.3 1.3 0 0 1 1.27 1.6l-1.3 5.6a2.6 2.6 0 0 1-2.53 2H13.6a2.6 2.6 0 0 1-2.54-2.07L9.4 10.6"/>
+  </g>
+  <circle cx="13.6" cy="24.4" r="1.7" fill="#FAFAFA"/>
+  <circle cx="20.6" cy="24.4" r="1.7" fill="#FAFAFA"/>
+</svg>

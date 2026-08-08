@@ -1,0 +1,31 @@
+# Local development database.
+#
+#   docker compose up -d      start Postgres
+#   docker compose down       stop it (data survives)
+#   docker compose down -v    stop it and wipe the data
+#
+# Postgres 17 with pg_trgm available — the search index in prisma/schema.prisma
+# needs that extension, and the migration enables it.
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: campuscart-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: campuscart
+      POSTGRES_PASSWORD: campuscart
+      POSTGRES_DB: campuscart
+    ports:
+      - '5432:5432'
+    volumes:
+      - campuscart-db:/var/lib/postgresql/data
+    # Wait for real query readiness, not just a listening port, so
+    # `db push` immediately after `up -d` doesn't race the boot.
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U campuscart -d campuscart']
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  campuscart-db:

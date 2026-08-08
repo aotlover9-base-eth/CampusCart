@@ -1,0 +1,1017 @@
+// CampusCart — data model
+// Covers shipped features plus schema-level room for flagged future work
+// (subscriptions, ratings, payments, wallet, referrals) so those land as
+// additive migrations rather than rewrites.
+
+// Prisma 7: the connection URL lives in prisma.config.ts, and the runtime
+// client is constructed with a driver adapter (see src/lib/db.ts).
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────── Enums ───────────────────────────
+
+enum UserRole {
+  HOSTELLER
+  DAY_SCHOLAR
+  OTHER
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+  DELETED
+}
+
+enum OtpChannel {
+  SMS
+  EMAIL
+}
+
+enum OtpPurpose {
+  SIGNUP
+  LOGIN
+  PHONE_VERIFY
+  EMAIL_VERIFY
+}
+
+enum ListingCondition {
+  NEW
+  LIKE_NEW
+  GOOD
+  FAIR
+  WELL_USED
+}
+
+enum ListingStatus {
+  DRAFT
+  PENDING_APPROVAL
+  ACTIVE
+  SOLD
+  RESERVED
+  HIDDEN
+  REMOVED
+}
+
+enum MediaKind {
+  IMAGE
+  VIDEO
+}
+
+/**
+ * Where a handover happens.
+ *
+ * Hostellers meet inside campus at a block. Day scholars and staff usually meet
+ * outside, so a day-scholar buyer can find day-scholar sellers near them rather
+ * than only campus listings.
+ */
+enum PickupArea {
+  INSIDE_CAMPUS
+  OUTSIDE_CAMPUS
+}
+
+enum ContactPreference {
+  CHAT_ONLY
+  CHAT_THEN_PHONE
+  PHONE_ON_REQUEST
+}
+
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COUNTERED
+  WITHDRAWN
+  EXPIRED
+}
+
+enum PhoneRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  AUTO_ACCEPTED
+  EXPIRED
+}
+
+enum MessageKind {
+  TEXT
+  IMAGE
+  SYSTEM
+  OFFER
+  PHONE_REQUEST
+}
+
+enum DeliveryState {
+  SENDING
+  SENT
+  DELIVERED
+  READ
+}
+
+enum NotificationKind {
+  NEW_MESSAGE
+  LISTING_SOLD
+  LISTING_LIKED
+  OFFER_RECEIVED
+  OFFER_ACCEPTED
+  OFFER_REJECTED
+  PHONE_REQUEST_RECEIVED
+  PHONE_REQUEST_ACCEPTED
+  PHONE_REQUEST_REJECTED
+  LISTING_APPROVED
+  LISTING_REPORTED
+  LISTING_REMOVED
+  ANNOUNCEMENT
+  ACCOUNT_VERIFIED
+}
+
+enum ReportTargetType {
+  LISTING
+  USER
+  MESSAGE
+  CONVERSATION
+}
+
+enum ReportStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  DISMISSED
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  MODERATOR
+  SUPPORT
+  ANALYST
+}
+
+// Future: subscriptions are modelled now, billing is not implemented.
+enum SubscriptionTier {
+  FREE
+  PLUS
+}
+
+enum SubscriptionStatus {
+  INACTIVE
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+}
+
+// ─────────────────────────── Users ───────────────────────────
+
+model User {
+  id       String @id @default(cuid())
+  fullName String
+
+  // Phone is mandatory and always verified before an account becomes usable.
+  // It is never exposed through the API unless a PhoneRequest was accepted.
+  phone           String    @unique
+  phoneVerifiedAt DateTime?
+
+  // Email is optional. A verified address on VIT_EMAIL_DOMAIN grants the
+  // VIT Verified badge; any other domain verifies the address only.
+  email           String?   @unique
+  emailVerifiedAt DateTime?
+  isVitVerified   Boolean   @default(false)
+
+  role       UserRole
+  department String?
+  year       Int?
+  bio        String?
+  avatarUrl  String?
+
+  status        AccountStatus @default(ACTIVE)
+  statusReason  String?
+  suspendedTill DateTime?
+
+  // Denormalised counters — kept in sync on write to avoid feed-time aggregates.
+  listingCount Int @default(0)
+  soldCount    Int @default(0)
+
+  lastSeenAt DateTime @default(now())
+  isOnline   Boolean  @default(false)
+
+  subscriptionTier   SubscriptionTier   @default(FREE)
+  subscriptionStatus SubscriptionStatus @default(INACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  hostelLocation   HostelLocation?
+  geoLocation      GeoLocation?
+  settings         UserSettings?
+  sessions         Session[]
+  listings         Listing[]
+  savedListings    SavedListing[]
+  likes            ListingLike[]
+  offersMade       Offer[]              @relation("OfferBuyer")
+  phoneRequests    PhoneRequest[]       @relation("PhoneRequestBuyer")
+  phoneGrants      PhoneRequest[]       @relation("PhoneRequestSeller")
+  conversationsA   Conversation[]       @relation("ConversationBuyer")
+  conversationsB   Conversation[]       @relation("ConversationSeller")
+  participantOf    ConversationMember[]
+  messages         Message[]
+  notifications    Notification[]
+  reportsFiled     Report[]             @relation("ReportReporter")
+  reportsAgainst   Report[]             @relation("ReportedUser")
+  blocksMade       UserBlock[]          @relation("BlockActor")
+  blocksReceived   UserBlock[]          @relation("BlockTarget")
+  subscription     Subscription?
+  ratingsGiven     Rating[]             @relation("RatingAuthor")
+  ratingsReceived  Rating[]             @relation("RatingSubject")
+  wallet           Wallet?
+  referralsSent    Referral[]           @relation("ReferralInviter")
+  referralReceived Referral?            @relation("ReferralInvitee")
+
+  @@index([status, createdAt])
+  @@index([role])
+  @@index([isVitVerified])
+  @@map("users")
+}
+
+model UserSettings {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  theme          String  @default("system") // "light" | "dark" | "system"
+  showRole       Boolean @default(true)
+  showDepartment Boolean @default(true)
+
+  // When true, an accepted PhoneRequest is required even for PLUS subscribers.
+  requirePhoneApproval Boolean @default(true)
+
+  notifyNewMessage    Boolean @default(true)
+  notifyOffers        Boolean @default(true)
+  notifyPhoneRequests Boolean @default(true)
+  notifyAnnouncements Boolean @default(true)
+  emailDigest         Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user_settings")
+}
+
+// Hosteller pickup details — block/room level, shown only once a chat exists.
+model HostelLocation {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  block          String
+  building       String?
+  floor          String?
+  roomNumber     String?
+  availableFrom  String? // "18:00"
+  availableTo    String? // "22:00"
+  meetingSpot    String?
+  instructions   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([block])
+  @@map("hostel_locations")
+}
+
+// Day scholar / other location — GPS, a pasted Maps link, or a dropped pin.
+model GeoLocation {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  latitude      Float?
+  longitude     Float?
+  googleMapsUrl String?
+  address       String?
+  area          String?
+  city          String?
+  source        String? // "gps" | "maps_link" | "pin" | "manual"
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([latitude, longitude])
+  @@map("geo_locations")
+}
+
+// ──────────────────── Auth: sessions & OTP ────────────────────
+
+// One row per refresh token. Rotation replaces the row and sets
+// replacedById, so a reused token is detectable as theft.
+model Session {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  refreshTokenHash String    @unique
+  replacedById     String?
+  revokedAt        DateTime?
+  expiresAt        DateTime
+
+  userAgent String?
+  ipHash    String? // hashed, never raw IP
+
+  createdAt      DateTime @default(now())
+  lastUsedAt     DateTime @default(now())
+
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// OTPs are stored hashed. Rows are consumed on success and swept on expiry.
+model OtpCode {
+  id String @id @default(cuid())
+
+  channel     OtpChannel
+  purpose     OtpPurpose
+  destination String // phone number or email address
+  codeHash    String
+
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  expiresAt  DateTime
+
+  requestIpHash String?
+  createdAt     DateTime @default(now())
+
+  @@index([destination, purpose, consumedAt])
+  @@index([expiresAt])
+  @@map("otp_codes")
+}
+
+// Sliding-window rate limiter. Also usable without Redis on serverless.
+model RateLimitHit {
+  id        String   @id @default(cuid())
+  bucket    String // e.g. "otp:send:+9198..." or "api:ip:<hash>"
+  createdAt DateTime @default(now())
+
+  @@index([bucket, createdAt])
+  @@map("rate_limit_hits")
+}
+
+// ─────────────────────── Categories ───────────────────────
+
+model Category {
+  id       String  @id @default(cuid())
+  name     String
+  slug     String  @unique
+  icon     String? // icon key resolved to an SVG in the design system
+  parentId String?
+
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryTree")
+
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
+  // Marks the catch-all "Other" node, which lets sellers type a custom label.
+  allowsCustomLabel Boolean @default(false)
+
+  listings Listing[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([parentId, sortOrder])
+  @@map("categories")
+}
+
+// ─────────────────────── Listings ───────────────────────
+
+model Listing {
+  id       String @id @default(cuid())
+  sellerId String
+  seller   User   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+
+  title       String
+  description String @db.Text // unlimited length
+
+  // Stored in paise to avoid float drift. 0 with isFree = true means giveaway.
+  priceInPaise Int
+  isFree       Boolean @default(false)
+  isNegotiable Boolean @default(true)
+
+  condition ListingCondition
+  status    ListingStatus    @default(ACTIVE)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+  // Free-text label when the seller picks the "Other" category.
+  customCategoryLabel String?
+
+  contactPreference ContactPreference @default(CHAT_THEN_PHONE)
+  availabilityNote  String?
+
+  // Location snapshot at post time — a listing keeps its pickup point even if
+  // the seller later moves, and the seller's exact room is never in the feed.
+  locationLabel String?
+  latitude      Float?
+  longitude     Float?
+  googleMapsUrl String?
+  hostelBlock   String?
+  pickupArea    PickupArea @default(INSIDE_CAMPUS)
+
+  viewCount Int @default(0)
+  likeCount Int @default(0)
+  saveCount Int @default(0)
+  chatCount Int @default(0)
+
+  // Future: promoted/featured placement. No payment path yet.
+  isFeatured   Boolean   @default(false)
+  featuredTill DateTime?
+  boostScore   Int       @default(0)
+
+  soldAt      DateTime?
+  soldToId    String?
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  media         ListingMedia[]
+  likes         ListingLike[]
+  saves         SavedListing[]
+  views         ListingView[]
+  offers        Offer[]
+  phoneRequests PhoneRequest[]
+  conversations Conversation[]
+  reports       Report[]
+
+  @@index([status, publishedAt(sort: Desc)])
+  @@index([categoryId, status])
+  @@index([sellerId, status])
+  @@index([priceInPaise])
+  @@index([latitude, longitude])
+  @@index([pickupArea, status, publishedAt(sort: Desc)])
+  @@index([isFeatured, publishedAt(sort: Desc)])
+  @@map("listings")
+}
+
+model ListingMedia {
+  id        String  @id @default(cuid())
+  listingId String
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  kind MediaKind
+  // Storage key, resolved to a URL by the active storage driver.
+  storageKey   String
+  thumbnailKey String?
+  mimeType     String
+  sizeBytes    Int
+  width        Int?
+  height       Int?
+  durationMs   Int? // videos only
+  blurDataUrl  String? // tiny inline placeholder for smooth image loading
+  altText      String?
+  sortOrder    Int     @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([listingId, sortOrder])
+  @@map("listing_media")
+}
+
+model ListingLike {
+  id        String  @id @default(cuid())
+  listingId String
+  userId    String
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([listingId, userId])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("listing_likes")
+}
+
+model SavedListing {
+  id        String  @id @default(cuid())
+  listingId String
+  userId    String
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([listingId, userId])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("saved_listings")
+}
+
+// Views are deduped per viewer per day by the unique key below.
+model ListingView {
+  id        String  @id @default(cuid())
+  listingId String
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  viewerId  String?
+  viewerKey String // userId, or a hashed anon fingerprint
+  dayBucket String // "2026-08-05"
+
+  createdAt DateTime @default(now())
+
+  @@unique([listingId, viewerKey, dayBucket])
+  @@index([listingId, createdAt])
+  @@map("listing_views")
+}
+
+// ─────────────────────────── Chat ───────────────────────────
+
+model Conversation {
+  id        String   @id @default(cuid())
+  listingId String?
+  listing   Listing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
+
+  buyerId  String
+  buyer    User   @relation("ConversationBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  sellerId String
+  seller   User   @relation("ConversationSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+
+  lastMessageAt      DateTime @default(now())
+  lastMessagePreview String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members  ConversationMember[]
+  messages Message[]
+  offers   Offer[]
+  reports  Report[]
+
+  // One thread per (listing, buyer, seller) triple.
+  @@unique([listingId, buyerId, sellerId])
+  @@index([lastMessageAt(sort: Desc)])
+  @@map("conversations")
+}
+
+// Per-participant state, so archive/mute/delete are one-sided.
+model ConversationMember {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  isArchived  Boolean   @default(false)
+  isMuted     Boolean   @default(false)
+  lastReadAt  DateTime?
+  unreadCount Int       @default(0)
+  // Soft delete: hides history before this point for this user only.
+  clearedAt   DateTime?
+  isTyping    Boolean   @default(false)
+  typingAt    DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@unique([conversationId, userId])
+  @@index([userId, isArchived, conversationId])
+  @@map("conversation_members")
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  kind MessageKind @default(TEXT)
+  body String?     @db.Text
+
+  // Image messages — compressed client-side, re-encoded server-side.
+  mediaKey       String?
+  mediaThumbKey  String?
+  mediaWidth     Int?
+  mediaHeight    Int?
+  mediaBlurUrl   String?
+  mediaSizeBytes Int?
+
+  // Set when kind is OFFER or PHONE_REQUEST, so the thread renders a card.
+  offerId        String?
+  offer          Offer?        @relation(fields: [offerId], references: [id], onDelete: SetNull)
+  phoneRequestId String?
+  phoneRequest   PhoneRequest? @relation(fields: [phoneRequestId], references: [id], onDelete: SetNull)
+
+  deliveryState DeliveryState @default(SENT)
+  deliveredAt   DateTime?
+  readAt        DateTime?
+
+  editedAt  DateTime?
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  reports Report[]
+
+  @@index([conversationId, createdAt(sort: Desc)])
+  @@index([senderId])
+  @@map("messages")
+}
+
+model UserBlock {
+  id       String @id @default(cuid())
+  actorId  String
+  actor    User   @relation("BlockActor", fields: [actorId], references: [id], onDelete: Cascade)
+  targetId String
+  target   User   @relation("BlockTarget", fields: [targetId], references: [id], onDelete: Cascade)
+
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@unique([actorId, targetId])
+  @@index([targetId])
+  @@map("user_blocks")
+}
+
+// ──────────────────── Offers & phone requests ────────────────────
+
+model Offer {
+  id        String  @id @default(cuid())
+  listingId String
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyerId   String
+  buyer     User    @relation("OfferBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+
+  conversationId String?
+  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+
+  amountInPaise Int
+  message       String?
+  status        OfferStatus @default(PENDING)
+
+  // Set when the seller counters instead of accepting or rejecting.
+  counterAmountInPaise Int?
+  respondedAt          DateTime?
+  expiresAt            DateTime?
+
+  messages Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([listingId, status])
+  @@index([buyerId, createdAt(sort: Desc)])
+  @@map("offers")
+}
+
+// The core of the phone-number policy: numbers are hidden until the seller
+// approves a specific buyer. Access is per-(listing, buyer, seller) and is the
+// only thing the API consults before revealing a number.
+model PhoneRequest {
+  id        String  @id @default(cuid())
+  listingId String
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  buyerId  String
+  buyer    User   @relation("PhoneRequestBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  sellerId String
+  seller   User   @relation("PhoneRequestSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+
+  status  PhoneRequestStatus @default(PENDING)
+  message String?
+
+  // True when a PLUS subscription skipped manual approval. Sellers who keep
+  // requirePhoneApproval on are never auto-accepted.
+  viaSubscription Boolean @default(false)
+
+  respondedAt DateTime?
+  expiresAt   DateTime?
+  revokedAt   DateTime?
+
+  messages Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([listingId, buyerId])
+  @@index([sellerId, status])
+  @@index([buyerId, status])
+  @@map("phone_requests")
+}
+
+// ──────────────────── Notifications ────────────────────
+
+model Notification {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  kind  NotificationKind
+  title String
+  body  String?
+  // Deep link into the app, e.g. "/listing/abc" or "/chats/xyz".
+  href  String?
+
+  // Loose reference to the subject row; kind determines the table.
+  entityType String?
+  entityId   String?
+  actorId    String?
+
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, readAt, createdAt(sort: Desc)])
+  @@map("notifications")
+}
+
+// ──────────────────── Reports & moderation ────────────────────
+
+model Report {
+  id         String @id @default(cuid())
+  reporterId String
+  reporter   User   @relation("ReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  targetType ReportTargetType
+  reason     String
+  details    String?          @db.Text
+
+  // Exactly one of these is set, matching targetType.
+  listingId      String?
+  listing        Listing?      @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  reportedUserId String?
+  reportedUser   User?         @relation("ReportedUser", fields: [reportedUserId], references: [id], onDelete: Cascade)
+  messageId      String?
+  message        Message?      @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  conversationId String?
+  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  status         ReportStatus @default(OPEN)
+  resolutionNote String?
+  resolvedById   String?
+  resolvedAt     DateTime?
+
+  // Admins may read a reported conversation only until this moment.
+  // Set to createdAt + 30 days when the report is filed.
+  moderationAccessExpiresAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([targetType, status])
+  @@map("reports")
+}
+
+// ──────────────────── Admin ────────────────────
+
+// Admin identities are entirely separate from User. Created only via
+// `npm run admin:create`; credentials are scrypt hashes, never in env or code.
+model AdminUser {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  email        String?   @unique
+  passwordHash String
+  role         AdminRole @default(MODERATOR)
+
+  totpSecret     String?
+  totpEnabledAt  DateTime?
+
+  isActive        Boolean   @default(true)
+  lastLoginAt     DateTime?
+  failedAttempts  Int       @default(0)
+  lockedUntil     DateTime?
+  mustChangePassword Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessions   AdminSession[]
+  auditLogs  AuditLog[]
+  chatAccess ChatAccessLog[]
+
+  @@map("admin_users")
+}
+
+model AdminSession {
+  id      String    @id @default(cuid())
+  adminId String
+  admin   AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  ipHash    String?
+  userAgent String?
+
+  createdAt  DateTime @default(now())
+  lastUsedAt DateTime @default(now())
+
+  @@index([adminId, revokedAt])
+  @@map("admin_sessions")
+}
+
+// Append-only. Every privileged action lands here.
+model AuditLog {
+  id      String     @id @default(cuid())
+  adminId String?
+  admin   AdminUser? @relation(fields: [adminId], references: [id], onDelete: SetNull)
+
+  action     String // "user.ban", "listing.remove", "settings.update", ...
+  entityType String?
+  entityId   String?
+  summary    String?
+  // Before/after snapshots for reversibility.
+  metadata   Json?
+
+  ipHash    String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt(sort: Desc)])
+  @@index([adminId, createdAt(sort: Desc)])
+  @@index([entityType, entityId])
+  @@map("audit_logs")
+}
+
+// Immutable record of every admin read of private chat content. Written before
+// the messages are returned, so a read cannot happen without a trace.
+model ChatAccessLog {
+  id      String    @id @default(cuid())
+  adminId String
+  admin   AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  conversationId String
+  // The report that authorised this access.
+  reportId       String
+  messageCount   Int     @default(0)
+  justification  String?
+
+  ipHash    String?
+  createdAt DateTime @default(now())
+
+  @@index([conversationId, createdAt(sort: Desc)])
+  @@index([adminId, createdAt(sort: Desc)])
+  @@map("chat_access_logs")
+}
+
+// Key/value site configuration, editable from the admin panel.
+model SiteSetting {
+  key         String   @id
+  value       Json
+  description String?
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
+model FeatureFlag {
+  key         String   @id
+  isEnabled   Boolean  @default(false)
+  description String?
+  // Optional percentage rollout, 0–100.
+  rolloutPercent Int   @default(100)
+  updatedAt   DateTime @updatedAt
+
+  @@map("feature_flags")
+}
+
+model Announcement {
+  id        String    @id @default(cuid())
+  title     String
+  body      String    @db.Text
+  variant   String    @default("info") // "info" | "warning" | "critical"
+  isActive  Boolean   @default(true)
+  startsAt  DateTime  @default(now())
+  endsAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([isActive, startsAt])
+  @@map("announcements")
+}
+
+// Daily rollups powering the admin dashboard without scanning raw tables.
+model DailyStat {
+  day             DateTime @id @db.Date
+  newUsers        Int      @default(0)
+  activeUsers     Int      @default(0)
+  newListings     Int      @default(0)
+  soldListings    Int      @default(0)
+  messagesSent    Int      @default(0)
+  newReports      Int      @default(0)
+  storageBytes    BigInt   @default(0)
+  pageViews       Int      @default(0)
+
+  @@map("daily_stats")
+}
+
+// ──────────────── Future features (schema only) ────────────────
+// Modelled now so they arrive as additive migrations. No billing, payout, or
+// escrow logic is implemented anywhere in the app yet.
+
+model Subscription {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tier   SubscriptionTier   @default(PLUS)
+  status SubscriptionStatus @default(INACTIVE)
+
+  pricePaise      Int       @default(2900) // ₹29/month
+  currentPeriodEnd DateTime?
+  cancelAtPeriodEnd Boolean  @default(false)
+
+  // Populated once a payment provider is wired up.
+  providerCustomerId     String?
+  providerSubscriptionId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("subscriptions")
+}
+
+model Rating {
+  id        String @id @default(cuid())
+  authorId  String
+  author    User   @relation("RatingAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  subjectId String
+  subject   User   @relation("RatingSubject", fields: [subjectId], references: [id], onDelete: Cascade)
+
+  listingId String?
+  score     Int // 1–5
+  review    String? @db.Text
+  isHidden  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@unique([authorId, subjectId, listingId])
+  @@index([subjectId, isHidden])
+  @@map("ratings")
+}
+
+model Wallet {
+  id      String @id @default(cuid())
+  userId  String @unique
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  balancePaise Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions WalletTransaction[]
+
+  @@map("wallets")
+}
+
+model WalletTransaction {
+  id       String @id @default(cuid())
+  walletId String
+  wallet   Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  amountPaise Int // signed: negative is a debit
+  kind        String // "credit" | "debit" | "refund" | "referral_bonus"
+  reference   String?
+  note        String?
+
+  createdAt DateTime @default(now())
+
+  @@index([walletId, createdAt(sort: Desc)])
+  @@map("wallet_transactions")
+}
+
+model Coupon {
+  id             String    @id @default(cuid())
+  code           String    @unique
+  description    String?
+  discountPercent Int?
+  discountPaise  Int?
+  maxRedemptions Int?
+  redeemedCount  Int       @default(0)
+  isActive       Boolean   @default(true)
+  expiresAt      DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@map("coupons")
+}
+
+model Referral {
+  id        String @id @default(cuid())
+  code      String @unique
+  inviterId String
+  inviter   User   @relation("ReferralInviter", fields: [inviterId], references: [id], onDelete: Cascade)
+
+  inviteeId String? @unique
+  invitee   User?   @relation("ReferralInvitee", fields: [inviteeId], references: [id], onDelete: SetNull)
+
+  rewardPaise Int       @default(0)
+  redeemedAt  DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([inviterId])
+  @@map("referrals")
+}
+

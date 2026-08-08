@@ -1,0 +1,40 @@
+<!-- Open Graph card, 1200×630. Rendered to og.png by scripts/generate-assets.ts.
+     Dark canvas so it holds up against both light and dark social timelines. -->
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#0A0A0B"/>
+
+  <!-- Soft silver wash from the lower right, echoing the app's surfaces -->
+  <defs>
+    <radialGradient id="wash" cx="0.82" cy="0.88" r="0.9">
+      <stop offset="0" stop-color="#27272A"/>
+      <stop offset="1" stop-color="#0A0A0B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#wash)"/>
+
+  <!-- Hairline grid, barely there -->
+  <g stroke="#1C1C1F" stroke-width="1">
+    <path d="M0 158h1200M0 315h1200M0 472h1200"/>
+    <path d="M300 0v630M600 0v630M900 0v630"/>
+  </g>
+
+  <!-- Mark -->
+  <g transform="translate(96 168)">
+    <g stroke="#FAFAFA" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" transform="scale(3.4)">
+      <path d="M4 6h3.2a2 2 0 0 1 1.94 1.51L9.6 9.5"/>
+      <path d="M9.6 9.5h16.2a1.6 1.6 0 0 1 1.56 1.96l-1.72 7.4a3.2 3.2 0 0 1-3.12 2.48H13.3a3.2 3.2 0 0 1-3.13-2.55L8.1 8.9"/>
+    </g>
+    <circle cx="45.6" cy="88.4" r="7.1" fill="#FAFAFA"/>
+    <circle cx="79.6" cy="88.4" r="7.1" fill="#FAFAFA"/>
+  </g>
+
+  <text x="212" y="252" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="60" font-weight="640" letter-spacing="-2.4" fill="#FAFAFA">Campus<tspan fill="#8F8F98">Cart</tspan></text>
+
+  <text x="96" y="386" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="46" font-weight="500" letter-spacing="-1.4" fill="#FAFAFA">Buy and sell across VIT Bhopal.</text>
+  <text x="96" y="444" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="30" font-weight="400" letter-spacing="-0.4" fill="#8F8F98">Electronics, books, cycles, furniture, services — students only.</text>
+
+  <!-- Verified-students pill -->
+  <rect x="96" y="498" width="292" height="52" rx="26" fill="none" stroke="#33333A" stroke-width="1.5"/>
+  <circle cx="128" cy="524" r="7" fill="#22C55E"/>
+  <text x="148" y="532" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="21" font-weight="500" letter-spacing="-0.3" fill="#8F8F98">Verified students only</text>
+</svg>

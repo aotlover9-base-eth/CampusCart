@@ -1,0 +1,33 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# Environment — never commit real credentials
+.env
+.env*.local
+.env.production
+
+# Uploaded media (local storage driver)
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Prisma
+prisma/*.db
+prisma/*.db-journal
+
+# Editor / OS
+.DS_Store
+*.pem
+.vscode/
+.idea/
+
+# Logs
+npm-debug.log*
+*.log
+
+# Misc
+.vercel
+*.tsbuildinfo
+next-env.d.ts
