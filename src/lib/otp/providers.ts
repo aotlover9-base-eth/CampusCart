@@ -403,12 +403,52 @@ export function smsProvider(): OtpProvider {
   }
 }
 
+class FirebaseEmailProvider implements OtpProvider {
+  readonly name = 'firebase'
+
+  async send({ destination, code }: OtpMessage): Promise<SendResult> {
+    const { NEXT_PUBLIC_FIREBASE_API_KEY } = env()
+    const apiKey = NEXT_PUBLIC_FIREBASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://campuscart-nine-zeta.vercel.app'
+    if (!apiKey) {
+      return { ok: false, error: 'Firebase API key is not configured' }
+    }
+
+    try {
+      const response = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            requestType: 'EMAIL_SIGNIN',
+            email: destination,
+            continueUrl: `${appUrl}/login?email=${encodeURIComponent(destination)}&code=${code}`,
+            canHandleCodeInApp: true,
+          }),
+        },
+      )
+
+      if (!response.ok) {
+        const body = (await response.json()) as { error?: { message?: string } }
+        return { ok: false, error: body.error?.message ?? `Firebase error (${response.status})` }
+      }
+
+      return { ok: true, devCode: isDevelopment ? code : undefined }
+    } catch (error) {
+      return { ok: false, error: error instanceof Error ? error.message : 'Firebase email request failed' }
+    }
+  }
+}
+
 export function emailProvider(): OtpProvider {
   switch (env().OTP_EMAIL_PROVIDER) {
     case 'resend':
       return new ResendProvider()
     case 'smtp':
       return new SmtpProvider()
+    case 'firebase':
+      return new FirebaseEmailProvider()
     default:
       return new ConsoleProvider()
   }

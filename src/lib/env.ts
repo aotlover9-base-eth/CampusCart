@@ -25,7 +25,7 @@ const serverSchema = z.object({
   OTP_SMS_PROVIDER: z
     .enum(['console', 'whatsapp', 'msg91-whatsapp', 'msg91', 'twilio', 'fast2sms', 'firebase'])
     .default('console'),
-  OTP_EMAIL_PROVIDER: z.enum(['console', 'resend', 'smtp']).default('console'),
+  OTP_EMAIL_PROVIDER: z.enum(['console', 'resend', 'smtp', 'firebase']).default('console'),
 
   NEXT_PUBLIC_FIREBASE_API_KEY: z.string().optional(),
   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: z.string().optional(),
