@@ -213,20 +213,23 @@ class WhatsAppCloudProvider implements OtpProvider {
             type: 'template',
             template: {
               name: WHATSAPP_TEMPLATE_NAME,
-              language: { code: WHATSAPP_TEMPLATE_LANG },
-              components: [
-                {
-                  type: 'body',
-                  parameters: [{ type: 'text', text: code }],
-                },
-                {
-                  // Required for the copy-code button to carry the value.
-                  type: 'button',
-                  sub_type: 'url',
-                  index: '0',
-                  parameters: [{ type: 'text', text: code }],
-                },
-              ],
+              language: { code: WHATSAPP_TEMPLATE_LANG ?? 'en_US' },
+              ...(WHATSAPP_TEMPLATE_NAME === 'hello_world'
+                ? {}
+                : {
+                    components: [
+                      {
+                        type: 'body',
+                        parameters: [{ type: 'text', text: code }],
+                      },
+                      {
+                        type: 'button',
+                        sub_type: 'url',
+                        index: '0',
+                        parameters: [{ type: 'text', text: code }],
+                      },
+                    ],
+                  }),
             },
           }),
         },
