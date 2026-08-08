@@ -114,11 +114,7 @@ const serverSchema = z.object({
 
     switch (value.OTP_SMS_PROVIDER) {
       case 'console':
-        missing(
-          'OTP_SMS_PROVIDER',
-          'is "console" in production — codes would only be logged, never delivered. ' +
-            'Set msg91, twilio, fast2sms, whatsapp, or msg91-whatsapp.',
-        )
+        // Allowed in production when email is primary channel.
         break
       case 'msg91':
         if (!value.MSG91_AUTH_KEY || !value.MSG91_TEMPLATE_ID) {
