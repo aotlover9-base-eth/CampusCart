@@ -23,9 +23,17 @@ const serverSchema = z.object({
   JWT_REFRESH_TTL: z.string().default('30d'),
 
   OTP_SMS_PROVIDER: z
-    .enum(['console', 'msg91', 'twilio', 'fast2sms', 'whatsapp', 'msg91-whatsapp'])
+    .enum(['console', 'whatsapp', 'msg91-whatsapp', 'msg91', 'twilio', 'fast2sms', 'firebase'])
     .default('console'),
   OTP_EMAIL_PROVIDER: z.enum(['console', 'resend', 'smtp']).default('console'),
+
+  NEXT_PUBLIC_FIREBASE_API_KEY: z.string().optional(),
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: z.string().optional(),
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: z.string().optional(),
+  NEXT_PUBLIC_FIREBASE_APP_ID: z.string().optional(),
+  FIREBASE_PROJECT_ID: z.string().optional(),
+  FIREBASE_CLIENT_EMAIL: z.string().optional(),
+  FIREBASE_PRIVATE_KEY: z.string().optional(),
   OTP_TTL_SECONDS: z.coerce.number().int().positive().default(300),
   OTP_MAX_ATTEMPTS: z.coerce.number().int().positive().default(5),
   OTP_RESEND_COOLDOWN_SECONDS: z.coerce.number().int().positive().default(60),

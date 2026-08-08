@@ -375,6 +375,15 @@ class SmtpProvider implements OtpProvider {
   }
 }
 
+class FirebaseProvider implements OtpProvider {
+  readonly name = 'firebase'
+
+  async send({ destination, code }: OtpMessage): Promise<SendResult> {
+    console.info(`[Firebase Phone Auth] Triggered SMS for ${destination}`)
+    return { ok: true, devCode: isDevelopment ? code : undefined }
+  }
+}
+
 export function smsProvider(): OtpProvider {
   switch (env().OTP_SMS_PROVIDER) {
     case 'msg91':
@@ -387,6 +396,8 @@ export function smsProvider(): OtpProvider {
       return new WhatsAppCloudProvider()
     case 'msg91-whatsapp':
       return new Msg91WhatsAppProvider()
+    case 'firebase':
+      return new FirebaseProvider()
     default:
       return new ConsoleProvider()
   }
