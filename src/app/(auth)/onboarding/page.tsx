@@ -12,16 +12,15 @@ export const metadata: Metadata = {
 export default async function OnboardingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ phone?: string; next?: string }>
+  searchParams: Promise<{ email?: string; phone?: string; next?: string }>
 }) {
   const user = await getSessionUser()
   if (user) redirect('/home')
 
-  const { phone, next } = await searchParams
+  const { email, phone, next } = await searchParams
+  const userEmail = email ?? phone ?? ''
 
-  // The phone number arrives from the verify step. Without it there is no proof
-  // of ownership to finish signup against, so send the user back to start.
-  if (!phone) redirect('/login')
+  if (!userEmail) redirect('/login')
 
-  return <OnboardingForm phone={phone} nextPath={next ?? null} />
+  return <OnboardingForm email={userEmail} nextPath={next ?? null} />
 }

@@ -22,7 +22,7 @@ export const CSRF_COOKIE = 'cc_csrf'
 export interface AuthUser {
   id: string
   fullName: string
-  phone: string
+  phone: string | null
   email: string | null
   role: string
   status: string
@@ -40,7 +40,7 @@ export interface AuthUser {
 export interface SessionUser {
   id: string
   fullName: string
-  phone: string
+  phone: string | null
   email: string | null
   emailVerifiedAt: string | null
   role: 'HOSTELLER' | 'DAY_SCHOLAR' | 'OTHER'

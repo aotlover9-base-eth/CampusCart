@@ -171,13 +171,12 @@ model User {
   id       String @id @default(cuid())
   fullName String
 
-  // Phone is mandatory and always verified before an account becomes usable.
-  // It is never exposed through the API unless a PhoneRequest was accepted.
-  phone           String    @unique
+  // Phone is optional.
+  phone           String?   @unique
   phoneVerifiedAt DateTime?
 
-  // Email is optional. A verified address on VIT_EMAIL_DOMAIN grants the
-  // VIT Verified badge; any other domain verifies the address only.
+  // Email is the primary login credential. A verified address on VIT_EMAIL_DOMAIN
+  // grants the VIT Verified badge.
   email           String?   @unique
   emailVerifiedAt DateTime?
   isVitVerified   Boolean   @default(false)
