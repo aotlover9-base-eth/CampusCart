@@ -40,7 +40,7 @@ const serverSchema = z.object({
   WHATSAPP_PHONE_NUMBER_ID: z.string().optional(),
   WHATSAPP_ACCESS_TOKEN: z.string().optional(),
   WHATSAPP_TEMPLATE_NAME: z.string().optional(),
-  WHATSAPP_TEMPLATE_LANG: z.string().default('en'),
+  WHATSAPP_TEMPLATE_LANG: z.string().default('en_US'),
   WHATSAPP_API_VERSION: z.string().default('v21.0'),
   TWILIO_ACCOUNT_SID: z.string().optional(),
   TWILIO_AUTH_TOKEN: z.string().optional(),

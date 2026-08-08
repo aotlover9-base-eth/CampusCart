@@ -197,6 +197,23 @@ class WhatsAppCloudProvider implements OtpProvider {
       return { ok: false, error: 'WhatsApp credentials are not configured' }
     }
 
+    const langCode = WHATSAPP_TEMPLATE_LANG === 'en' ? 'en_US' : WHATSAPP_TEMPLATE_LANG
+    const isHelloWorld = WHATSAPP_TEMPLATE_NAME === 'hello_world'
+
+    const templatePayload: Record<string, unknown> = {
+      name: WHATSAPP_TEMPLATE_NAME,
+      language: { code: langCode },
+    }
+
+    if (!isHelloWorld) {
+      templatePayload.components = [
+        {
+          type: 'body',
+          parameters: [{ type: 'text', text: code }],
+        },
+      ]
+    }
+
     try {
       const response = await fetch(
         `https://graph.facebook.com/${WHATSAPP_API_VERSION}/${WHATSAPP_PHONE_NUMBER_ID}/messages`,
@@ -211,26 +228,7 @@ class WhatsAppCloudProvider implements OtpProvider {
             // Graph wants a bare E.164 number with no leading plus.
             to: destination.replace(/^\+/, ''),
             type: 'template',
-            template: {
-              name: WHATSAPP_TEMPLATE_NAME,
-              language: { code: WHATSAPP_TEMPLATE_LANG ?? 'en_US' },
-              ...(WHATSAPP_TEMPLATE_NAME === 'hello_world'
-                ? {}
-                : {
-                    components: [
-                      {
-                        type: 'body',
-                        parameters: [{ type: 'text', text: code }],
-                      },
-                      {
-                        type: 'button',
-                        sub_type: 'url',
-                        index: '0',
-                        parameters: [{ type: 'text', text: code }],
-                      },
-                    ],
-                  }),
-            },
+            template: templatePayload,
           }),
         },
       )
