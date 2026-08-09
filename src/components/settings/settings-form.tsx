@@ -243,8 +243,8 @@ export function SettingsForm({
       <Section title="Account">
         <Row
           label="Phone number"
-          value={user.phone ?? 'Not linked'}
-          hint="Optional. Never shown publicly unless requested."
+          value={user.phone ?? ''}
+          hint="Verified. Never shown publicly."
         />
         <EmailVerification
           currentEmail={user.email}

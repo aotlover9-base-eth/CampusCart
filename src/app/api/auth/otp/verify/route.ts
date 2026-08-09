@@ -42,16 +42,23 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
 
     const user = await db.user.findFirst({
-      where: { email: destination },
+      where: body.channel === 'SMS' ? { phone: destination } : { email: destination },
       select: { id: true, status: true, deletedAt: true, fullName: true, role: true },
     })
 
-    // No account: the caller has proven control of the email address but still needs a profile.
+    // No account: the caller has proven control of the number but still needs a
+    // profile. Signup is completed by the next request.
     if (!user || user.deletedAt) {
+      if (body.channel !== 'SMS') {
+        return fail(
+          'No account uses this email. Sign up with your phone number first.',
+          404,
+        )
+      }
       return ok({
         verified: true,
         next: 'needs_profile' as const,
-        email: destination,
+        phone: destination,
       })
     }
 
@@ -59,14 +66,12 @@ export async function POST(request: Request): Promise<NextResponse> {
       return fail('This account is not active. Contact support.', 403)
     }
 
-    const vitDomain = env().VIT_EMAIL_DOMAIN.toLowerCase()
-    const isVit = destination.toLowerCase().endsWith(`@${vitDomain}`)
-
+    // Verifying by SMS also confirms the number, which matters for accounts
+    // created before a phone-verification backfill.
     await db.user.update({
       where: { id: user.id },
       data: {
-        emailVerifiedAt: new Date(),
-        ...(isVit ? { isVitVerified: true } : {}),
+        ...(body.channel === 'SMS' ? { phoneVerifiedAt: new Date() } : {}),
         lastSeenAt: new Date(),
         isOnline: true,
       },

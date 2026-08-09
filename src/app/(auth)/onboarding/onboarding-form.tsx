@@ -37,16 +37,16 @@ interface CompleteProfileResult {
 }
 
 export function OnboardingForm({
-  email: initialEmail,
+  phone,
   nextPath,
 }: {
-  email: string
+  phone: string
   nextPath: string | null
 }) {
   const [step, setStep] = useState<Step>('identity')
 
   const [fullName, setFullName] = useState('')
-  const [email, setEmail] = useState(initialEmail)
+  const [email, setEmail] = useState('')
   const [department, setDepartment] = useState('')
   const [year, setYear] = useState('')
   const [bio, setBio] = useState('')
@@ -124,9 +124,10 @@ export function OnboardingForm({
       await api<CompleteProfileResult>('/api/auth/complete-profile', {
         method: 'POST',
         body: {
-          email: (email.trim() || initialEmail).trim(),
+          phone,
           fullName: fullName.trim(),
           role,
+          ...(email.trim() ? { email: email.trim() } : {}),
           ...(department ? { department } : {}),
           ...(year ? { year: Number(year) } : {}),
           ...(bio.trim() ? { bio: bio.trim() } : {}),
