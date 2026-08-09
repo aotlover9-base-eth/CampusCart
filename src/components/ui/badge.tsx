@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils'
 /**
  * Small inline labels: condition, status, role, and category chips.
  *
- * Tone maps to the monochrome system — `neutral` is the default and the only
+ * Tone maps to the monochrome system - `neutral` is the default and the only
  * one used in bulk; colour appears solely where it carries meaning (sold,
  * negotiable, free).
  */
@@ -44,7 +44,7 @@ export function Badge({
   )
 }
 
-/** Human labels for the condition enum — used in cards, detail, and filters. */
+/** Human labels for the condition enum - used in cards, detail, and filters. */
 export const CONDITION_LABELS: Record<string, string> = {
   NEW: 'New',
   LIKE_NEW: 'Like new',

@@ -22,12 +22,12 @@ export default function PrivacyPage() {
       <Section heading="What we collect">
         <List
           items={[
-            'Your name, phone number, and — if you add one — your VIT email address',
+            'Your name, phone number, and - if you add one - your VIT email address',
             'Your role, department, and year, so buyers know who they are dealing with',
             'A profile photo, if you upload one',
             'Your listings: text, photos, videos, price, and location details',
             'Your messages to other students',
-            'Location you choose to attach to a listing — a hostel block, or coordinates if you share them',
+            'Location you choose to attach to a listing - a hostel block, or coordinates if you share them',
             'Basic technical data needed to keep the service running and to rate-limit abuse',
           ]}
         />
@@ -53,7 +53,7 @@ export default function PrivacyPage() {
         <p>
           Messages are stored so they are there when you come back, and they are
           visible to you and the person you are talking to. They are not
-          end-to-end encrypted — we could technically read them, and the paragraph
+          end-to-end encrypted - we could technically read them, and the paragraph
           below sets out the only circumstances in which we do.
         </p>
         <p>
@@ -88,7 +88,7 @@ export default function PrivacyPage() {
         </p>
         <List
           items={[
-            'Our infrastructure providers — database, file storage, and SMS or email delivery — strictly to run the service',
+            'Our infrastructure providers - database, file storage, and SMS or email delivery - strictly to run the service',
             'Moderators, in the limited and logged circumstances described above',
             'Law enforcement, where we are legally required to respond',
           ]}
@@ -100,7 +100,7 @@ export default function PrivacyPage() {
         <p>
           Your account data stays while your account is open. Deleting your account
           removes your profile and your listings. Messages you sent stay visible to
-          the person who received them, shown as being from a deleted account —
+          the person who received them, shown as being from a deleted account -
           otherwise their side of the conversation would stop making sense.
         </p>
         <p>

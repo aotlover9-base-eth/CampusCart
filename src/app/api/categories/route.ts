@@ -5,7 +5,7 @@ import { listCategories } from '@/lib/categories'
 /**
  * GET /api/categories
  *
- * The full category tree with live listing counts. Cached briefly — categories
+ * The full category tree with live listing counts. Cached briefly - categories
  * change rarely, and every compose screen and filter panel requests this.
  */
 

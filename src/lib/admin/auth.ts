@@ -165,7 +165,7 @@ export async function revokeAdminSession(sessionId: string): Promise<void> {
 /**
  * Append to the audit trail.
  *
- * Every privileged action calls this. Never throws — a logging failure must not
+ * Every privileged action calls this. Never throws - a logging failure must not
  * roll back the action it was recording, and the alternative (silently skipping
  * the action) is worse.
  */

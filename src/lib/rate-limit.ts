@@ -8,7 +8,7 @@ import { hashIp } from './crypto'
  * Serverless functions have no shared memory, so counters live in Postgres.
  * Each check deletes expired hits for the bucket, counts what remains, and
  * inserts a new hit when the request is allowed. Swap in Redis/Upstash later by
- * reimplementing `consume` — every caller goes through it.
+ * reimplementing `consume` - every caller goes through it.
  */
 
 export interface RateLimitResult {
@@ -99,7 +99,7 @@ export function apiLimiter(identifier: string): Promise<RateLimitResult> {
   })
 }
 
-/** OTP sends are limited per destination — the expensive, abusable action. */
+/** OTP sends are limited per destination - the expensive, abusable action. */
 export function otpSendLimiter(destination: string): Promise<RateLimitResult> {
   return consume({
     bucket: `otp:send:${destination}`,
@@ -126,7 +126,7 @@ export function otpVerifyLimiter(destination: string): Promise<RateLimitResult> 
   })
 }
 
-/** Login attempts against the hidden admin panel — deliberately tight. */
+/** Login attempts against the hidden admin panel - deliberately tight. */
 export function adminLoginLimiter(identifier: string): Promise<RateLimitResult> {
   return consume({
     bucket: `admin:login:${identifier}`,

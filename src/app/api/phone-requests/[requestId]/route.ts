@@ -7,7 +7,7 @@ import { notify } from '@/lib/notifications'
 import { publish } from '@/lib/realtime'
 
 /**
- * POST /api/phone-requests/[requestId] — accept, reject, or revoke.
+ * POST /api/phone-requests/[requestId] - accept, reject, or revoke.
  *
  * Revoking is what makes sharing reversible: an accepted request can be pulled
  * back at any time, and the number stops resolving for that buyer immediately.

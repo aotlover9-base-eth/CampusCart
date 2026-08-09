@@ -9,8 +9,8 @@ import { storage } from '@/lib/storage'
 import { notify } from '@/lib/notifications'
 
 /**
- * GET   /api/admin/listings — search and page through listings
- * PATCH /api/admin/listings — approve, remove, restore, feature, or delete
+ * GET   /api/admin/listings - search and page through listings
+ * PATCH /api/admin/listings - approve, remove, restore, feature, or delete
  */
 
 const querySchema = cursorPaginationSchema.extend({

@@ -87,7 +87,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       void auditLog({
         adminId: admin.id,
         action: 'admin.login.failed',
-        summary: shouldLock ? 'Failed sign-in — account locked' : 'Failed sign-in',
+        summary: shouldLock ? 'Failed sign-in - account locked' : 'Failed sign-in',
       })
 
       return reject()

@@ -1,25 +1,17 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
 import { api, ApiError } from '@/lib/client/fetcher'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { OtpInput } from '@/components/ui/otp-input'
-import { ArrowLeftIcon, PhoneIcon } from '@/components/ui/icons'
+import { ArrowLeftIcon } from '@/components/ui/icons'
 
-/**
- * Two-step sign-in: enter a destination, then the code.
- *
- * Phone is the primary channel because the account is keyed on a verified
- * number. Email is offered as a convenience for returning users who linked one,
- * and cannot create an account on its own.
- */
-
-type Channel = 'SMS' | 'EMAIL'
-type Step = 'destination' | 'code'
+type Mode = 'SIGNIN' | 'SIGNUP'
+type Step = 'form' | 'code'
 
 interface RequestResult {
   sent: boolean
@@ -31,25 +23,39 @@ interface RequestResult {
 interface VerifyResult {
   verified: boolean
   next: 'signed_in' | 'needs_profile' | 'email_attached'
-  phone?: string
+  email?: string
+}
+
+interface CompleteProfileResult {
+  created: boolean
+  user: { id: string; fullName: string; role: string }
+}
+
+interface LoginResult {
+  signedIn: boolean
+  user: { id: string; fullName: string; role: string }
 }
 
 const RESEND_SECONDS = 60
 
 export function LoginForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
-  // Middleware puts the blocked destination here so sign-in returns the user
-  // to wherever they were actually headed.
   const nextPath = searchParams.get('next')
 
-  const [channel, setChannel] = useState<Channel>('SMS')
-  const [step, setStep] = useState<Step>('destination')
+  const [mode, setMode] = useState<Mode>('SIGNIN')
+  const [step, setStep] = useState<Step>('form')
 
-  const [phone, setPhone] = useState('')
-  const [email, setEmail] = useState('')
+  // Sign In fields
+  const [loginEmail, setLoginEmail] = useState('')
+  const [loginPassword, setLoginPassword] = useState('')
+
+  // Sign Up fields
+  const [fullName, setFullName] = useState('')
+  const [signupEmail, setSignupEmail] = useState('')
+  const [createPassword, setCreatePassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+
   const [code, setCode] = useState('')
-
   const [maskedDestination, setMaskedDestination] = useState('')
   const [devCode, setDevCode] = useState<string | null>(null)
 
@@ -58,6 +64,21 @@ export function LoginForm() {
   const [fieldError, setFieldError] = useState<string | null>(null)
   const [secondsLeft, setSecondsLeft] = useState(0)
 
+  // Password rules validation
+  const hasMinLength = createPassword.length >= 8
+  const hasUppercase = /[A-Z]/.test(createPassword)
+  const hasLowercase = /[a-z]/.test(createPassword)
+  const hasNumber = /[0-9]/.test(createPassword)
+  const hasSymbol = /[^a-zA-Z0-9]/.test(createPassword)
+  const passwordsMatch = createPassword.length > 0 && createPassword === confirmPassword
+
+  const isPasswordValid = hasMinLength && hasUppercase && hasLowercase && hasNumber && hasSymbol
+  const isSignupFormValid =
+    fullName.trim().length >= 2 &&
+    signupEmail.trim().length > 0 &&
+    isPasswordValid &&
+    passwordsMatch
+
   // Countdown for the resend cooldown.
   useEffect(() => {
     if (secondsLeft <= 0) return
@@ -65,11 +86,35 @@ export function LoginForm() {
     return () => window.clearTimeout(timer)
   }, [secondsLeft])
 
-  const destination = channel === 'SMS' ? phone : email
-
-  async function requestCode(event?: React.FormEvent) {
-    event?.preventDefault()
+  async function handlePasswordLogin(event: React.FormEvent) {
+    event.preventDefault()
     if (submitting) return
+
+    setSubmitting(true)
+    setError(null)
+    setFieldError(null)
+
+    try {
+      await api<LoginResult>('/api/auth/login', {
+        method: 'POST',
+        body: { email: loginEmail.trim(), password: loginPassword },
+      })
+
+      window.location.href = nextPath ?? '/home'
+    } catch (caught) {
+      if (caught instanceof ApiError) {
+        setError(caught.message)
+      } else {
+        setError('Could not sign in. Check your credentials and connection.')
+      }
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  async function handleSignupRequestOtp(event: React.FormEvent) {
+    event.preventDefault()
+    if (!isSignupFormValid || submitting) return
 
     setSubmitting(true)
     setError(null)
@@ -79,9 +124,9 @@ export function LoginForm() {
       const result = await api<RequestResult>('/api/auth/otp/request', {
         method: 'POST',
         body: {
-          channel,
-          purpose: 'LOGIN',
-          ...(channel === 'SMS' ? { phone } : { email }),
+          channel: 'EMAIL',
+          email: signupEmail.trim(),
+          purpose: 'SIGNUP',
         },
       })
 
@@ -92,65 +137,65 @@ export function LoginForm() {
       setCode('')
     } catch (caught) {
       if (caught instanceof ApiError) {
-        // A field-level message belongs under the input, not in the banner.
-        const field = caught.fields?.phone ?? caught.fields?.email
-        if (field) setFieldError(field)
-        else setError(caught.message)
+        setError(caught.message)
       } else {
-        setError('Could not send the code. Check your connection.')
+        setError('Could not send the verification code.')
       }
     } finally {
       setSubmitting(false)
     }
   }
 
-  const verifyCode = useCallback(
+  const verifyCodeAndRegister = useCallback(
     async (submittedCode: string) => {
       setSubmitting(true)
       setError(null)
 
       try {
-        const result = await api<VerifyResult>('/api/auth/otp/verify', {
+        const verifyRes = await api<VerifyResult>('/api/auth/otp/verify', {
           method: 'POST',
           body: {
-            channel,
-            purpose: 'LOGIN',
+            channel: 'EMAIL',
+            email: signupEmail.trim(),
+            purpose: 'SIGNUP',
             code: submittedCode,
-            ...(channel === 'SMS' ? { phone } : { email }),
           },
         })
 
-        if (result.next === 'needs_profile') {
-          // Verified number with no account yet — continue into signup. The
-          // number is passed along so onboarding doesn't ask for it twice.
-          const params = new URLSearchParams({ phone: result.phone ?? phone })
-          if (nextPath) params.set('next', nextPath)
-          router.push(`/onboarding?${params.toString()}`)
-          return
+        if (verifyRes.next === 'needs_profile') {
+          // Add user to database immediately after OTP verification
+          await api<CompleteProfileResult>('/api/auth/complete-profile', {
+            method: 'POST',
+            body: {
+              email: signupEmail.trim(),
+              password: createPassword,
+              fullName: fullName.trim(),
+              role: 'OTHER',
+            },
+          })
         }
 
-        // Full navigation, not router.push: the session cookie was just set and
-        // every cached server component needs to re-render against it.
         window.location.href = nextPath ?? '/home'
       } catch (caught) {
         setCode('')
         setError(
-          caught instanceof ApiError ? caught.message : 'Could not verify that code.',
+          caught instanceof ApiError ? caught.message : 'Could not verify code and create account.',
         )
         setSubmitting(false)
       }
     },
-    [channel, phone, email, nextPath, router],
+    [signupEmail, createPassword, fullName, nextPath],
   )
 
-  function changeChannel(next: Channel) {
-    setChannel(next)
+  function changeMode(next: Mode) {
+    setMode(next)
+    setStep('form')
     setError(null)
     setFieldError(null)
   }
 
   function goBack() {
-    setStep('destination')
+    setStep('form')
     setCode('')
     setError(null)
   }
@@ -158,89 +203,170 @@ export function LoginForm() {
   return (
     <div>
       <AnimatePresence mode="wait" initial={false}>
-        {step === 'destination' ? (
+        {step === 'form' ? (
           <motion.div
-            key="destination"
+            key="form"
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -8 }}
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
             <h1 className="text-[26px] font-semibold tracking-[-0.025em] text-[var(--color-ink)]">
-              Sign in
+              {mode === 'SIGNIN' ? 'Sign in to CampusCart' : 'Create your account'}
             </h1>
             <p className="mt-1.5 text-[14px] leading-relaxed text-[var(--color-ink-muted)]">
-              We'll text you a six-digit code. No password to remember.
+              {mode === 'SIGNIN'
+                ? 'Enter your email and password to sign in.'
+                : 'Enter your details and set a password to sign up.'}
             </p>
 
             <div
               role="tablist"
-              aria-label="Sign-in method"
+              aria-label="Sign-in or Sign-up"
               className="mt-6 grid grid-cols-2 gap-1 rounded-[12px] bg-[var(--color-surface-sunken)] p-1"
             >
-              <ChannelTab
-                active={channel === 'SMS'}
-                onClick={() => changeChannel('SMS')}
-                label="Phone"
+              <TabButton
+                active={mode === 'SIGNIN'}
+                onClick={() => changeMode('SIGNIN')}
+                label="Sign In"
               />
-              <ChannelTab
-                active={channel === 'EMAIL'}
-                onClick={() => changeChannel('EMAIL')}
-                label="Email"
+              <TabButton
+                active={mode === 'SIGNUP'}
+                onClick={() => changeMode('SIGNUP')}
+                label="Sign Up"
               />
             </div>
 
-            <form onSubmit={requestCode} className="mt-5 space-y-4">
-              {channel === 'SMS' ? (
+            {mode === 'SIGNIN' ? (
+              <form onSubmit={handlePasswordLogin} className="mt-5 space-y-4">
                 <Input
-                  key="phone"
-                  type="tel"
-                  inputMode="numeric"
-                  autoComplete="tel"
-                  autoFocus
-                  label="Mobile number"
-                  prefix="+91"
-                  placeholder="98765 43210"
-                  value={phone}
-                  onChange={(event) => setPhone(event.target.value)}
-                  error={fieldError ?? undefined}
-                  hint={!fieldError ? 'Indian mobile numbers only.' : undefined}
-                />
-              ) : (
-                <Input
-                  key="email"
+                  key="login-email"
                   type="email"
                   autoComplete="email"
                   autoFocus
                   label="Email address"
                   placeholder="you@vitbhopal.ac.in"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
+                  value={loginEmail}
+                  onChange={(event) => setLoginEmail(event.target.value)}
                   error={fieldError ?? undefined}
-                  hint={
-                    !fieldError
-                      ? 'Only works if you already linked this address.'
+                />
+
+                <Input
+                  key="login-password"
+                  type="password"
+                  autoComplete="current-password"
+                  label="Password"
+                  placeholder="••••••••"
+                  value={loginPassword}
+                  onChange={(event) => setLoginPassword(event.target.value)}
+                />
+
+                {error && <ErrorBanner message={error} />}
+
+                <Button
+                  type="submit"
+                  size="lg"
+                  fullWidth
+                  loading={submitting}
+                  disabled={!loginEmail.trim() || !loginPassword}
+                >
+                  Sign In
+                </Button>
+
+                <p className="mt-3 text-center text-[13px] text-[var(--color-ink-muted)]">
+                  Don't have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => changeMode('SIGNUP')}
+                    className="font-medium text-[var(--color-ink)] underline underline-offset-2"
+                  >
+                    Sign Up
+                  </button>
+                </p>
+              </form>
+            ) : (
+              <form onSubmit={handleSignupRequestOtp} className="mt-5 space-y-4">
+                <Input
+                  key="signup-name"
+                  type="text"
+                  autoComplete="name"
+                  autoFocus
+                  label="Full name"
+                  placeholder="Aarav Sharma"
+                  value={fullName}
+                  onChange={(event) => setFullName(event.target.value)}
+                />
+
+                <Input
+                  key="signup-email"
+                  type="email"
+                  autoComplete="email"
+                  label="Email address"
+                  placeholder="you@vitbhopal.ac.in"
+                  value={signupEmail}
+                  onChange={(event) => setSignupEmail(event.target.value)}
+                  hint="We will send a 6-digit OTP code to verify your email."
+                />
+
+                <Input
+                  key="create-password"
+                  type="password"
+                  autoComplete="new-password"
+                  label="Create Password"
+                  placeholder="Create a strong password"
+                  value={createPassword}
+                  onChange={(event) => setCreatePassword(event.target.value)}
+                />
+
+                <Input
+                  key="confirm-password"
+                  type="password"
+                  autoComplete="new-password"
+                  label="Confirm Password"
+                  placeholder="Re-enter your password"
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  error={
+                    confirmPassword.length > 0 && !passwordsMatch
+                      ? 'Passwords do not match'
                       : undefined
                   }
                 />
-              )}
 
-              {error && <ErrorBanner message={error} />}
+                <div className="rounded-[10px] bg-[var(--color-surface-sunken)] p-3 text-[12px] space-y-1">
+                  <p className="font-medium text-[var(--color-ink)] mb-1">Password Requirements:</p>
+                  <RuleItem met={hasMinLength} text="At least 8 characters long" />
+                  <RuleItem met={hasUppercase} text="At least 1 Capital letter (A-Z)" />
+                  <RuleItem met={hasLowercase} text="At least 1 Small letter (a-z)" />
+                  <RuleItem met={hasNumber} text="At least 1 Number (0-9)" />
+                  <RuleItem met={hasSymbol} text="At least 1 Special symbol (@, #, $, !, %, etc.)" />
+                  <RuleItem met={passwordsMatch} text="Passwords match" />
+                </div>
 
-              <Button
-                type="submit"
-                size="lg"
-                fullWidth
-                loading={submitting}
-                disabled={destination.trim().length === 0}
-              >
-                Send code
-              </Button>
-            </form>
+                {error && <ErrorBanner message={error} />}
 
-            <p className="mt-5 text-center text-[13px] text-[var(--color-ink-muted)]">
-              New here? Signing in with your phone creates your account.
-            </p>
+                <Button
+                  type="submit"
+                  size="lg"
+                  fullWidth
+                  loading={submitting}
+                  disabled={!isSignupFormValid}
+                >
+                  Send OTP Code
+                </Button>
+
+                <p className="mt-3 text-center text-[13px] text-[var(--color-ink-muted)]">
+                  Already have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => changeMode('SIGNIN')}
+                    className="font-medium text-[var(--color-ink)] underline underline-offset-2"
+                  >
+                    Sign In
+                  </button>
+                </p>
+              </form>
+            )}
           </motion.div>
         ) : (
           <motion.div
@@ -259,22 +385,21 @@ export function LoginForm() {
               )}
             >
               <ArrowLeftIcon className="h-3.5 w-3.5" />
-              Change {channel === 'SMS' ? 'number' : 'email'}
+              Back to form
             </button>
 
             <h1 className="text-[26px] font-semibold tracking-[-0.025em] text-[var(--color-ink)]">
-              Enter your code
+              Verify your email
             </h1>
-            <p className="mt-1.5 flex items-center gap-1.5 text-[14px] text-[var(--color-ink-muted)]">
-              <PhoneIcon className="h-4 w-4 shrink-0" />
-              Sent to <span className="font-medium text-[var(--color-ink)]">{maskedDestination}</span>
+            <p className="mt-1.5 text-[14px] text-[var(--color-ink-muted)]">
+              Sent 6-digit verification code to <span className="font-medium text-[var(--color-ink)]">{maskedDestination}</span>
             </p>
 
             <div className="mt-7">
               <OtpInput
                 value={code}
                 onChange={setCode}
-                onComplete={verifyCode}
+                onComplete={verifyCodeAndRegister}
                 disabled={submitting}
                 error={error ?? undefined}
                 autoFocus
@@ -282,7 +407,6 @@ export function LoginForm() {
             </div>
 
             {devCode && (
-              // Dev-mode convenience: the console driver has no real delivery.
               <p className="mt-4 rounded-[10px] border border-dashed border-[var(--color-line-strong)] px-3 py-2 text-center text-[13px] text-[var(--color-ink-muted)]">
                 Dev code: <span className="font-mono font-semibold text-[var(--color-ink)]">{devCode}</span>
               </p>
@@ -294,9 +418,9 @@ export function LoginForm() {
               fullWidth
               loading={submitting}
               disabled={code.length !== 6}
-              onClick={() => verifyCode(code)}
+              onClick={() => verifyCodeAndRegister(code)}
             >
-              Verify and continue
+              Verify and Create Account
             </Button>
 
             <div className="mt-5 text-center text-[13px] text-[var(--color-ink-muted)]">
@@ -305,7 +429,7 @@ export function LoginForm() {
               ) : (
                 <button
                   type="button"
-                  onClick={() => void requestCode()}
+                  onClick={(e) => void handleSignupRequestOtp(e)}
                   disabled={submitting}
                   className="font-medium text-[var(--color-ink)] underline underline-offset-2 disabled:opacity-50"
                 >
@@ -320,7 +444,20 @@ export function LoginForm() {
   )
 }
 
-function ChannelTab({
+function RuleItem({ met, text }: { met: boolean; text: string }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <span className={cn('text-[11px] font-bold', met ? 'text-[var(--color-success)]' : 'text-[var(--color-ink-subtle)]')}>
+        {met ? '✓' : '•'}
+      </span>
+      <span className={met ? 'text-[var(--color-ink)] font-medium' : 'text-[var(--color-ink-muted)]'}>
+        {text}
+      </span>
+    </div>
+  )
+}
+
+function TabButton({
   active,
   onClick,
   label,
@@ -342,7 +479,7 @@ function ChannelTab({
     >
       {active && (
         <motion.span
-          layoutId="channel-tab"
+          layoutId="mode-tab"
           transition={{ type: 'spring', stiffness: 500, damping: 38 }}
           className="absolute inset-0 rounded-[9px] bg-[var(--color-surface)] shadow-[var(--shadow-xs)]"
         />

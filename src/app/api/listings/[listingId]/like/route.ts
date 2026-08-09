@@ -4,8 +4,8 @@ import { requireUser } from '@/lib/auth/context'
 import { db } from '@/lib/db'
 
 /**
- * POST   /api/listings/[listingId]/like — like
- * DELETE /api/listings/[listingId]/like — unlike
+ * POST   /api/listings/[listingId]/like - like
+ * DELETE /api/listings/[listingId]/like - unlike
  *
  * The unique (listingId, userId) constraint makes both idempotent, so a
  * double-tap or a retried request can't inflate the counter.
@@ -36,7 +36,7 @@ export async function POST(_request: Request, props: Props): Promise<NextRespons
         }),
       ])
     } catch {
-      // Already liked — report the current state rather than an error.
+      // Already liked - report the current state rather than an error.
       const likeCount = await db.listing
         .findUnique({ where: { id: listingId }, select: { likeCount: true } })
         .then((r) => r?.likeCount ?? 0)

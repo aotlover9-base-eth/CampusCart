@@ -57,7 +57,7 @@ export function FilterSheet({
   }
 
   function reset() {
-    // Keep the search term and sort — those belong to the page, not the panel.
+    // Keep the search term and sort - those belong to the page, not the panel.
     setDraft({ q: filters.q, sort: filters.sort })
   }
 
@@ -125,7 +125,7 @@ export function FilterSheet({
                 }))
               }
             />
-            <span className="text-[var(--color-ink-subtle)]">–</span>
+            <span className="text-[var(--color-ink-subtle)]">-</span>
             <Input
               type="number"
               inputMode="numeric"

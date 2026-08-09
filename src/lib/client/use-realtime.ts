@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react'
 /**
  * Subscribes to the SSE stream and dispatches events to a handler.
  *
- * EventSource reconnects on its own, so there is no retry logic here — the
+ * EventSource reconnects on its own, so there is no retry logic here - the
  * server sends a `retry:` hint and the browser honours it. The handler is held
  * in a ref so a caller passing an inline arrow doesn't tear down and rebuild the
  * connection on every render.

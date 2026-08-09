@@ -19,7 +19,7 @@ export interface MediaItem {
  * Feed media tile.
  *
  * Videos autoplay silently once at least half the tile is on screen and pause
- * when it leaves — the Instagram/X behaviour. Muted autoplay is the only kind
+ * when it leaves - the Instagram/X behaviour. Muted autoplay is the only kind
  * browsers permit without a user gesture, so sound stays opt-in via the toggle,
  * and the choice is remembered for the session.
  */

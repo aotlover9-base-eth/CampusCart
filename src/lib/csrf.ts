@@ -29,7 +29,7 @@ export const CSRF_HEADER = 'x-csrf-token'
 /**
  * Verify a state-changing request. Throws CsrfError on mismatch.
  *
- * Also checks Origin against the configured app URL when the header is present —
+ * Also checks Origin against the configured app URL when the header is present -
  * browsers always send it on cross-origin POSTs, so a wrong value is a strong
  * signal regardless of the token.
  */
@@ -63,8 +63,8 @@ export async function assertCsrf(): Promise<void> {
  * the attacker's page sends its own Origin against our Host.
  *
  * Deriving the expected value from the request is also what keeps this working
- * wherever the app is actually served — a dev server that fell back to another
- * port, a preview deployment, a tunnel — none of which match a hardcoded
+ * wherever the app is actually served - a dev server that fell back to another
+ * port, a preview deployment, a tunnel - none of which match a hardcoded
  * NEXT_PUBLIC_APP_URL. The configured URL is still accepted, for the case where
  * a proxy rewrites Host to an internal name.
  */

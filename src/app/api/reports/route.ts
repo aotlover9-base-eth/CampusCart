@@ -73,7 +73,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     })
 
     if (duplicate) {
-      // Report quietly accepted — telling the user it is a duplicate invites
+      // Report quietly accepted - telling the user it is a duplicate invites
       // them to file it again under a different reason.
       return ok({ reported: true, reportId: duplicate.id })
     }

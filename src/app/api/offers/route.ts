@@ -10,8 +10,8 @@ import { notify } from '@/lib/notifications'
 import { publish } from '@/lib/realtime'
 
 /**
- * GET  /api/offers — offers the caller made or received
- * POST /api/offers — make an offer on a listing
+ * GET  /api/offers - offers the caller made or received
+ * POST /api/offers - make an offer on a listing
  *
  * An offer always lands in the thread as an OFFER message, so the negotiation
  * stays in one place rather than living in a separate inbox the seller has to
@@ -53,7 +53,7 @@ export async function GET(request: Request): Promise<NextResponse> {
 
 const createSchema = z.object({
   listingId: z.string().min(1),
-  // Rupees in, paise stored — the same convention as listing prices.
+  // Rupees in, paise stored - the same convention as listing prices.
   amountRupees: z.coerce.number().positive().max(1_000_000),
   message: z.string().trim().max(500).optional(),
 })
@@ -87,7 +87,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     if (!['ACTIVE', 'RESERVED'].includes(listing.status)) {
       return fail('This listing is no longer available', 409)
     }
-    if (listing.isFree) return fail('This item is free — just message the seller', 400)
+    if (listing.isFree) return fail('This item is free - just message the seller', 400)
     if (!listing.isNegotiable) return fail('The seller has set a fixed price', 400)
 
     if (await isBlockedBetween(user.id, listing.sellerId)) {

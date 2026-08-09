@@ -14,7 +14,7 @@ import { AdminList, AdminRow, FilterTabs } from './admin-list'
  * User moderation.
  *
  * Destructive actions go through a confirmation that states the consequence in
- * plain words — the difference between a suspension and a ban is not obvious
+ * plain words - the difference between a suspension and a ban is not obvious
  * from a button label alone.
  */
 
@@ -86,7 +86,7 @@ export function AdminUsers() {
           Users
         </h1>
         <p className="mt-0.5 text-[13px] text-[var(--color-ink-muted)]">
-          Search by name or email. Phone matches only on the full number.
+          Search by name or email address.
         </p>
       </header>
 
@@ -96,7 +96,7 @@ export function AdminUsers() {
         filters={{ q: search || undefined, status: status || undefined }}
         searchValue={search}
         onSearch={setSearch}
-        searchPlaceholder="Name, email, or full phone number"
+        searchPlaceholder="Name or email address..."
         toolbar={<FilterTabs options={STATUS_FILTERS} value={status} onChange={setStatus} />}
         emptyMessage="No users match."
         renderRow={(user, refresh) => (
@@ -132,7 +132,7 @@ export function AdminUsers() {
               </div>
 
               <p className="truncate text-[12px] text-[var(--color-ink-muted)]">
-                {user.email ?? user.phone} · {user.department ?? user.role}
+                {user.email} · {user.department ?? user.role}
               </p>
               <p className="text-[11.5px] text-[var(--color-ink-subtle)]">
                 {user.listingCount} listed · {user.soldCount} sold · joined{' '}

@@ -13,7 +13,7 @@ import { SORT_OPTIONS, SortSelect } from '@/components/listing/sort-select'
 /**
  * Home feed: category rail, sort control, and the listing grid.
  *
- * Filters live in component state rather than the URL — home is a browsing
+ * Filters live in component state rather than the URL - home is a browsing
  * surface, and /browse is the shareable, URL-driven one. Distance sort needs
  * coordinates, so it is only offered to users who have a saved location.
  */

@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 /**
  * Button primitive.
  *
- * Variants map to the monochrome palette — `primary` is solid ink (black in
+ * Variants map to the monochrome palette - `primary` is solid ink (black in
  * light mode, white in dark), which keeps the UI colour-free by default.
  */
 

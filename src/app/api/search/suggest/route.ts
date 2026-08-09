@@ -7,7 +7,7 @@ import { db } from '@/lib/db'
  * GET /api/search/suggest
  *
  * Autocomplete for the search bar. Kept separate from /api/search because it
- * fires on every keystroke and must stay cheap — prefix matching only, no
+ * fires on every keystroke and must stay cheap - prefix matching only, no
  * similarity scoring, no media joins.
  */
 export async function GET(request: Request): Promise<NextResponse> {

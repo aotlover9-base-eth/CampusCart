@@ -7,8 +7,8 @@ import { cursorPaginationSchema } from '@/lib/validation'
 import { db } from '@/lib/db'
 
 /**
- * GET   /api/admin/users — search and page through accounts
- * PATCH /api/admin/users — ban, suspend, reinstate, verify, or delete
+ * GET   /api/admin/users - search and page through accounts
+ * PATCH /api/admin/users - ban, suspend, reinstate, verify, or delete
  *
  * Reads are open to any admin; writes need MODERATOR or above, and deletion
  * needs SUPER_ADMIN. Every write lands in the audit log with a before/after

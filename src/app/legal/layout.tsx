@@ -6,7 +6,7 @@ import { ThemeToggle } from '@/components/theme/theme-toggle'
 /**
  * Reading layout for the legal pages.
  *
- * A single measured column — these are documents, not app screens, so the
+ * A single measured column - these are documents, not app screens, so the
  * chrome stays out of the way and the line length stays readable.
  */
 export default function LegalLayout({ children }: { children: ReactNode }) {

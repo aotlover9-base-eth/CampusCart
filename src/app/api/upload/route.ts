@@ -12,7 +12,7 @@ import { env } from '@/lib/env'
  * to a listing or message. Uploading is separated from listing creation so the
  * compose screen can show real thumbnails while the seller is still typing.
  *
- * Every file is verified by magic bytes and re-encoded — see src/lib/storage.ts.
+ * Every file is verified by magic bytes and re-encoded - see src/lib/storage.ts.
  */
 
 // Videos need the full body in memory, so allow generous time on slow uploads.

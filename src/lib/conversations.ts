@@ -159,7 +159,7 @@ export function serializeMessage(row: MessageRow, viewerId: string) {
       : null,
     offerId: row.offerId,
     // Denormalised onto the message so an OFFER bubble can render amount and
-    // status — and so the seller can accept or decline without leaving chat.
+    // status - and so the seller can accept or decline without leaving chat.
     offer: row.offer
       ? {
           id: row.offer.id,
@@ -185,7 +185,7 @@ export type SerializedMessage = ReturnType<typeof serializeMessage>
 /**
  * Whether two users may message each other.
  *
- * A block in either direction closes the thread for both — the blocker should
+ * A block in either direction closes the thread for both - the blocker should
  * not receive messages, and the blocked user should not be able to tell that
  * they were blocked by watching their messages fail differently.
  */

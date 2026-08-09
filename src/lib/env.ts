@@ -4,7 +4,7 @@ import { z } from 'zod'
  * Validated environment access.
  *
  * Server-only values are parsed lazily on first use so that importing this
- * module from a client component never throws — client code may only read the
+ * module from a client component never throws - client code may only read the
  * `publicEnv` object below.
  */
 
@@ -102,7 +102,7 @@ const serverSchema = z.object({
    *
    * Skipped during `next build`. The build runs with NODE_ENV=production and
    * collects route configuration, but a CI or Docker build legitimately has no
-   * production secrets — enforcing there would make the image unbuildable.
+   * production secrets - enforcing there would make the image unbuildable.
    * NEXT_PHASE is set by Next only for the build, so runtime still gets checked.
    */
   .superRefine((value, ctx) => {
@@ -116,7 +116,7 @@ const serverSchema = z.object({
       case 'console':
         missing(
           'OTP_SMS_PROVIDER',
-          'is "console" in production — codes would only be logged, never delivered. ' +
+          'is "console" in production - codes would only be logged, never delivered. ' +
             'Set msg91, twilio, fast2sms, whatsapp, or msg91-whatsapp.',
         )
         break
@@ -157,7 +157,7 @@ const serverSchema = z.object({
 
     // The default panel path is published in this repository.
     if (value.ADMIN_PANEL_PATH === 'control-a7f3c9') {
-      missing('ADMIN_PANEL_PATH', 'is still the repository default — change it before deploying')
+      missing('ADMIN_PANEL_PATH', 'is still the repository default - change it before deploying')
     }
   })
 

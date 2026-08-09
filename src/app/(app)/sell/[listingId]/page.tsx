@@ -21,7 +21,7 @@ interface Props {
  * Edit an existing listing.
  *
  * Reuses the compose form. Ownership is enforced here as well as in the PATCH
- * handler — this stops someone reaching the form at all, rather than only
+ * handler - this stops someone reaching the form at all, rather than only
  * failing when they submit.
  */
 export default async function EditListingPage({ params }: Props) {

@@ -33,7 +33,7 @@ export const listCategories = unstable_cache(
   loadCategoryTree,
   ['category-tree'],
   // Cached at the data layer rather than via a route-level `revalidate`, which
-  // would make Next prerender /api/categories at build time — and that needs a
+  // would make Next prerender /api/categories at build time - and that needs a
   // live database, breaking Docker and CI builds.
   { revalidate: 300, tags: [CATEGORY_CACHE_TAG] },
 )

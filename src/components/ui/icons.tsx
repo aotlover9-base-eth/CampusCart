@@ -1,7 +1,7 @@
 import type { SVGProps } from 'react'
 
 /**
- * UI icon set — navigation, actions, and status glyphs.
+ * UI icon set - navigation, actions, and status glyphs.
  *
  * Distinct from `brand/icons.tsx`, which holds category art. All of these are
  * 24×24 with a 1.8 stroke and inherit `currentColor`, so they sit optically
@@ -419,7 +419,7 @@ export function UsersIcon(props: IconProps) {
 }
 
 /**
- * Two hands meeting — offers and phone requests, both of which are one person
+ * Two hands meeting - offers and phone requests, both of which are one person
  * asking another to agree to something.
  */
 export function HandshakeIcon(props: IconProps) {

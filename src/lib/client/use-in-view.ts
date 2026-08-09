@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 /**
  * Reports whether an element is currently in view.
  *
- * One IntersectionObserver per element is fine here — the feed holds tens of
+ * One IntersectionObserver per element is fine here - the feed holds tens of
  * cards, not thousands, and a shared observer would need its own callback
  * registry for no measurable gain.
  */

@@ -21,7 +21,7 @@ import {
 /**
  * Admin chrome: a fixed sidebar on desktop, a scrolling tab strip on mobile.
  *
- * Every link is built from `basePath`, which the server passes down from env —
+ * Every link is built from `basePath`, which the server passes down from env -
  * the panel's location is never hardcoded in client code.
  */
 

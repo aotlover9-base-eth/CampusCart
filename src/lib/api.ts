@@ -51,7 +51,7 @@ export function handler(fn: () => Promise<NextResponse>): Promise<NextResponse> 
   return fn().catch((error: unknown) => {
     // Deliberate, client-facing errors carry their own 4xx status. Matching on
     // that shape rather than on a list of classes keeps this handler decoupled
-    // from every module that defines one — including admin auth, which lives
+    // from every module that defines one - including admin auth, which lives
     // outside lib/auth entirely.
     const status = clientErrorStatus(error)
     if (status !== null) {

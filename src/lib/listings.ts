@@ -7,7 +7,7 @@ import { haversineKm } from './utils'
  * Listing read helpers shared by the feed, search, and detail routes.
  *
  * One selection shape is used everywhere so a field can never leak from one
- * endpoint but not another. Seller phone numbers are absent by construction —
+ * endpoint but not another. Seller phone numbers are absent by construction -
  * they are only ever returned by the phone-request route in Phase 3.
  */
 

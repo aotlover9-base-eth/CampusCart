@@ -6,7 +6,7 @@ import { publicEnv } from '@/lib/env'
  * Sitemap.
  *
  * Only genuinely public, shareable URLs: the landing page, browse, and live
- * listings. Signed-in surfaces and the admin panel are absent by construction —
+ * listings. Signed-in surfaces and the admin panel are absent by construction -
  * this is built from a query for ACTIVE listings, so a private page cannot leak
  * into it by someone forgetting to exclude it.
  */

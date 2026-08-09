@@ -21,11 +21,11 @@ const fontDisplay = Outfit({
 
 export const metadata: Metadata = {
   title: {
-    default: `${publicEnv.appName} — The VIT Bhopal marketplace`,
+    default: `${publicEnv.appName} - The VIT Bhopal marketplace`,
     template: `%s · ${publicEnv.appName}`,
   },
   description:
-    'Buy and sell across VIT Bhopal. Electronics, books, cycles, furniture, services — everything students need.',
+    'Buy and sell across VIT Bhopal. Electronics, books, cycles, furniture, services - everything students need.',
   applicationName: publicEnv.appName,
   keywords: [
     'VIT Bhopal',
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_IN',
     siteName: publicEnv.appName,
-    title: `${publicEnv.appName} — The VIT Bhopal marketplace`,
+    title: `${publicEnv.appName} - The VIT Bhopal marketplace`,
     description: 'Buy and sell across VIT Bhopal.',
     url: publicEnv.appUrl,
     images: [
@@ -53,13 +53,13 @@ export const metadata: Metadata = {
         url: '/og.png',
         width: 1200,
         height: 630,
-        alt: `${publicEnv.appName} — the VIT Bhopal student marketplace`,
+        alt: `${publicEnv.appName} - the VIT Bhopal student marketplace`,
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${publicEnv.appName} — The VIT Bhopal marketplace`,
+    title: `${publicEnv.appName} - The VIT Bhopal marketplace`,
     description: 'Buy and sell across VIT Bhopal.',
     images: ['/og.png'],
   },

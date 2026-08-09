@@ -8,7 +8,7 @@ import { env, isDevelopment } from '../env'
  * reports `devCode`, which the API echoes back to the UI in non-production only.
  *
  * Indian SMS requires TRAI DLT registration with the vendor before real sends
- * will work — hence the console default.
+ * will work - hence the console default.
  */
 
 export interface SendResult {
@@ -178,7 +178,7 @@ class Fast2SmsProvider implements OtpProvider {
  *     it as the button parameter, because the one-tap/copy-code button reads it
  *     from there. Sending only the body renders a button that copies nothing.
  *
- * The recipient must have WhatsApp installed — see `resolveSmsProvider`, which
+ * The recipient must have WhatsApp installed - see `resolveSmsProvider`, which
  * is why a fallback channel is worth configuring.
  */
 class WhatsAppCloudProvider implements OtpProvider {
@@ -343,9 +343,19 @@ class ResendProvider implements OtpProvider {
       })
 
       const body = (await response.json()) as { id?: string; message?: string }
-      if (!response.ok) return { ok: false, error: body.message ?? `Resend ${response.status}` }
+      if (!response.ok) {
+        if (process.env.NODE_ENV !== 'production') {
+          console.warn(`[Resend Dev Fallback] ${body.message}. Code: ${code}`)
+          return { ok: true, providerMessageId: 'dev-fallback' }
+        }
+        return { ok: false, error: body.message ?? `Resend ${response.status}` }
+      }
       return { ok: true, providerMessageId: body.id }
     } catch (error) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn(`[Resend Dev Fallback] Request failed. Code: ${code}`)
+        return { ok: true, providerMessageId: 'dev-fallback' }
+      }
       return { ok: false, error: error instanceof Error ? error.message : 'Resend request failed' }
     }
   }
@@ -362,7 +372,7 @@ function otpEmailHtml(code: string, minutes: number): string {
 </div></body></html>`
 }
 
-/** SMTP is intentionally not bundled — nodemailer is added only if selected. */
+/** SMTP is intentionally not bundled - nodemailer is added only if selected. */
 class SmtpProvider implements OtpProvider {
   readonly name = 'smtp'
 

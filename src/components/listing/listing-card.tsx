@@ -16,7 +16,7 @@ import { ListingMedia, MediaFallback } from './listing-media'
  * Feed card.
  *
  * The whole card is one link; the like and save controls sit above it and stop
- * propagation. Both are optimistic — the count moves immediately and rolls back
+ * propagation. Both are optimistic - the count moves immediately and rolls back
  * only if the request fails, because a marketplace feed that waits on a round
  * trip to fill a heart feels broken.
  */
@@ -55,7 +55,7 @@ export function ListingCard({
         `/api/listings/${listing.id}/like`,
         { method: nextLiked ? 'POST' : 'DELETE' },
       )
-      // Trust the server's count — another viewer may have liked it meanwhile.
+      // Trust the server's count - another viewer may have liked it meanwhile.
       setLiked(result.liked)
       setLikeCount(result.likeCount)
     } catch {

@@ -191,7 +191,7 @@ export function ListingComposer({
         )
         toast.success(
           result.pendingApproval
-            ? 'Submitted — it goes live once reviewed'
+            ? 'Submitted - it goes live once reviewed'
             : publish
               ? 'Your listing is live'
               : 'Saved as a draft',
@@ -238,7 +238,7 @@ export function ListingComposer({
 
         <Textarea
           label="Description"
-          placeholder="Condition, age, what's included, why you're selling. Be specific — it saves both of you a chat."
+          placeholder="Condition, age, what's included, why you're selling. Be specific - it saves both of you a chat."
           value={description}
           onChange={(event) => setDescription(event.target.value)}
           error={fields.description}

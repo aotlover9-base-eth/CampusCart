@@ -12,8 +12,8 @@ import { ListingCard } from './listing-card'
 /**
  * Cursor-paginated listing grid.
  *
- * Owns fetching so every surface that shows listings — home, browse, search,
- * a profile, saved — reuses one implementation and gets identical loading,
+ * Owns fetching so every surface that shows listings - home, browse, search,
+ * a profile, saved - reuses one implementation and gets identical loading,
  * empty, and error handling.
  */
 

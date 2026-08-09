@@ -74,7 +74,7 @@ export function AdminListings() {
         dataKey="listings"
         filters={{
           q: search || undefined,
-          // "reported" is a flag, not a status — send it on the right param.
+          // "reported" is a flag, not a status - send it on the right param.
           ...(filter === 'reported'
             ? { reported: 'true' }
             : filter

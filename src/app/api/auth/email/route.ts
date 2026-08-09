@@ -8,7 +8,7 @@ import { db } from '@/lib/db'
 import { env } from '@/lib/env'
 
 /**
- * Email verification — the only path to the VIT Verified badge.
+ * Email verification - the only path to the VIT Verified badge.
  *
  * POST   sends a code to the address
  * PUT    confirms the code, attaches the email, and grants the badge when the
@@ -75,7 +75,7 @@ export async function PUT(request: Request): Promise<NextResponse> {
         : fail(result.error ?? 'Verification failed', 400, { code: result.error ?? '' })
     }
 
-    // Re-check uniqueness at commit time — another account may have claimed the
+    // Re-check uniqueness at commit time - another account may have claimed the
     // address between the send and the confirm.
     const taken = await db.user.findFirst({
       where: { email, deletedAt: null, NOT: { id: user.id } },
@@ -94,7 +94,7 @@ export async function PUT(request: Request): Promise<NextResponse> {
         email,
         emailVerifiedAt: new Date(),
         // The badge is granted only for a verified address on the VIT domain,
-        // and is never revoked here — an admin can remove it if needed.
+        // and is never revoked here - an admin can remove it if needed.
         ...(isVit ? { isVitVerified: true } : {}),
       },
       select: { email: true, emailVerifiedAt: true, isVitVerified: true },

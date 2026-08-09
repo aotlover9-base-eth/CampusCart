@@ -11,7 +11,7 @@ import { LockIcon } from '@/components/ui/icons'
 /**
  * Admin sign-in form.
  *
- * Intentionally spare — no branding, no product name, no "forgot password", no
+ * Intentionally spare - no branding, no product name, no "forgot password", no
  * hint about what lives behind it. The panel's base path is read from the
  * current URL so nothing here has to know the configured value.
  */

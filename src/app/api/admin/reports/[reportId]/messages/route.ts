@@ -13,7 +13,7 @@ import { storage } from '@/lib/storage'
  * capability in the product, so it is fenced on four sides:
  *
  *  1. MODERATOR or above only.
- *  2. A report must exist and actually name a conversation — there is no way to
+ *  2. A report must exist and actually name a conversation - there is no way to
  *     read an arbitrary thread by id.
  *  3. The report's moderation window must still be open (30 days from filing).
  *  4. A ChatAccessLog row is written *before* the messages are returned, so a

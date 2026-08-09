@@ -4,7 +4,7 @@ import { THEME_STORAGE_KEY } from './theme-constants'
  * Blocking inline script that sets the theme before first paint.
  *
  * A server component on purpose. React 19 warns that a `<script>` rendered from
- * a client component is never executed, and this file must run — otherwise a
+ * a client component is never executed, and this file must run - otherwise a
  * dark-mode device flashes white on every load.
  *
  * Kept dependency-free and synchronous so it finishes before the browser paints.

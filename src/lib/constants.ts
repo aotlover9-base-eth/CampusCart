@@ -10,7 +10,7 @@
 /**
  * VIT Bhopal hostel blocks.
  *
- * Eight numbered blocks, each split into an A and a B wing — 1A through 8B,
+ * Eight numbered blocks, each split into an A and a B wing - 1A through 8B,
  * sixteen in total. Generated rather than hand-listed so the pattern is stated
  * once and a wing can never be missed from the middle of the list.
  */
@@ -19,11 +19,11 @@ export const HOSTEL_BLOCKS: readonly string[] = Array.from({ length: 8 }, (_, in
 ).flat()
 
 /**
- * "1A" → "Block 1A", for places where the surrounding field label is absent —
+ * "1A" → "Block 1A", for places where the surrounding field label is absent -
  * a listing card or a profile line, where a bare "1A" reads as noise.
  *
  * Values that already begin with a letter are passed through untouched, so a
- * block stored before the 1A–8B scheme does not become "Block Block A".
+ * block stored before the 1A-8B scheme does not become "Block Block A".
  */
 export function hostelBlockLabel(block: string): string {
   return /^\d/.test(block) ? `Block ${block}` : block
@@ -31,29 +31,29 @@ export function hostelBlockLabel(block: string): string {
 
 /** Schools and common programmes. */
 export const DEPARTMENTS = [
-  'SCOPE — Computer Science & Engineering',
-  'SCOPE — CSE (AI & ML)',
-  'SCOPE — CSE (Cyber Security)',
-  'SCOPE — CSE (Data Science)',
-  'SCOPE — CSE (Health Informatics)',
-  'SCOPE — CSE (Gaming Technology)',
-  'SENSE — Electronics & Communication',
-  'SENSE — ECE (VLSI)',
-  'SMEC — Mechanical Engineering',
-  'SMEC — Mechatronics & Automation',
-  'SCE — Civil Engineering',
-  'SEEE — Electrical & Electronics',
-  'SBST — Biotechnology',
-  'SAS — Physics',
-  'SAS — Chemistry',
-  'SAS — Mathematics',
-  'VSB — Business Administration',
-  'VSL — Law',
-  'SADA — Architecture & Design',
+  'SCOPE - Computer Science & Engineering',
+  'SCOPE - CSE (AI & ML)',
+  'SCOPE - CSE (Cyber Security)',
+  'SCOPE - CSE (Data Science)',
+  'SCOPE - CSE (Health Informatics)',
+  'SCOPE - CSE (Gaming Technology)',
+  'SENSE - Electronics & Communication',
+  'SENSE - ECE (VLSI)',
+  'SMEC - Mechanical Engineering',
+  'SMEC - Mechatronics & Automation',
+  'SCE - Civil Engineering',
+  'SEEE - Electrical & Electronics',
+  'SBST - Biotechnology',
+  'SAS - Physics',
+  'SAS - Chemistry',
+  'SAS - Mathematics',
+  'VSB - Business Administration',
+  'VSL - Law',
+  'SADA - Architecture & Design',
   'Other',
 ] as const
 
-/** Undergraduate and postgraduate years. Matches `yearSchema` (1–5). */
+/** Undergraduate and postgraduate years. Matches `yearSchema` (1-5). */
 export const YEAR_OPTIONS = [
   { value: 1, label: '1st year' },
   { value: 2, label: '2nd year' },
@@ -132,7 +132,7 @@ export const REPORT_REASONS = [
  * Previously inferred from the seller's role, which was wrong in both
  * directions: a hosteller can hand something over at a café off campus, and a
  * day scholar can meet at the main gate. Sellers now say explicitly, and buyers
- * can filter on it — which is what lets a day scholar find other day scholars
+ * can filter on it - which is what lets a day scholar find other day scholars
  * rather than only campus listings.
  */
 export const PICKUP_AREA_OPTIONS = [
@@ -144,7 +144,7 @@ export const PICKUP_AREA_OPTIONS = [
   {
     value: 'OUTSIDE_CAMPUS',
     label: 'Outside campus',
-    description: 'Meet off campus — useful for day scholars.',
+    description: 'Meet off campus - useful for day scholars.',
   },
 ] as const
 

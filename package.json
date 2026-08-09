@@ -2,11 +2,12 @@
   "name": "campuscart",
   "version": "0.1.0",
   "private": true,
-  "description": "CampusCart — the VIT Bhopal student marketplace.",
+  "description": "CampusCart - the VIT Bhopal student marketplace.",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
+    "check": "npm run typecheck && npm run lint",
     "lint": "eslint src scripts",
     "typecheck": "tsc --noEmit",
     "db:generate": "prisma generate",

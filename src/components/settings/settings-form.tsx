@@ -42,7 +42,7 @@ export function SettingsForm({
 }: {
   user: SessionUser
   settings: UserSettings
-  /** Server-side env value — the domain that grants the VIT badge. */
+  /** Server-side env value - the domain that grants the VIT badge. */
   vitDomain: string
 }) {
   const router = useRouter()
@@ -57,6 +57,7 @@ export function SettingsForm({
   const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl)
   const [hostelBlock, setHostelBlock] = useState(user.hostelBlock ?? '')
 
+  const [phone, setPhone] = useState(user.phone ? user.phone.replace(/^\+91/, '') : '')
   const [settings, setSettings] = useState(initialSettings)
   const [savingProfile, setSavingProfile] = useState(false)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
@@ -73,6 +74,7 @@ export function SettingsForm({
         method: 'PATCH',
         body: {
           fullName: fullName.trim(),
+          phone: phone.trim() ? phone.trim() : null,
           department: department || undefined,
           year: year ? Number(year) : undefined,
           bio: bio.trim() || null,
@@ -82,7 +84,7 @@ export function SettingsForm({
         },
       })
 
-      patch({ fullName: fullName.trim(), department: department || null, bio: bio.trim() || null })
+      patch({ fullName: fullName.trim(), phone: phone.trim() ? `+91${phone.trim()}` : null, department: department || null, bio: bio.trim() || null })
       toast.success('Profile updated')
       router.refresh()
     } catch (error) {
@@ -241,17 +243,26 @@ export function SettingsForm({
       </Section>
 
       <Section title="Account">
-        <Row
-          label="Phone number"
-          value={user.phone ?? ''}
-          hint="Verified. Never shown publicly."
-        />
-        <EmailVerification
-          currentEmail={user.email}
-          isVerified={Boolean(user.emailVerifiedAt)}
-          isVitVerified={user.isVitVerified}
-          vitDomain={vitDomain}
-        />
+        <div className="space-y-3">
+          <Input
+            type="tel"
+            inputMode="numeric"
+            label="Phone number (optional)"
+            prefix="+91"
+            placeholder="9876543210"
+            value={phone}
+            onChange={(event) => setPhone(event.target.value)}
+            error={fields.phone}
+            hint="Type your mobile number if you wish to share it with buyers upon request."
+          />
+
+          <EmailVerification
+            currentEmail={user.email}
+            isVerified={Boolean(user.emailVerifiedAt)}
+            isVitVerified={user.isVitVerified}
+            vitDomain={vitDomain}
+          />
+        </div>
       </Section>
 
       <Section title="Appearance">
@@ -280,7 +291,7 @@ export function SettingsForm({
           checked={settings.requirePhoneApproval}
           onChange={(value) => void toggle('requirePhoneApproval', value)}
           label="Approve every phone request"
-          description="Buyers must ask before seeing your number, and you approve each one. Turning this off still requires a request — it just lets subscribers skip the wait later."
+          description="Buyers must ask before seeing your number, and you approve each one."
         />
         <Toggle
           checked={settings.showRole}
@@ -332,32 +343,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
-function Row({
-  label,
-  value,
-  hint,
-  badge,
-}: {
-  label: string
-  value: string
-  hint?: string
-  badge?: React.ReactNode
-}) {
-  return (
-    <div className="rounded-[var(--radius-md)] border border-[var(--color-line)] p-3.5">
-      <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-[12.5px] text-[var(--color-ink-subtle)]">{label}</p>
-          <p className="mt-0.5 truncate text-[14px] text-[var(--color-ink)]">{value}</p>
-        </div>
-        {badge}
-      </div>
-      {hint && (
-        <p className="mt-2 text-[12px] leading-relaxed text-[var(--color-ink-muted)]">{hint}</p>
-      )}
-    </div>
-  )
-}
+
 
 function Toggle({
   checked,

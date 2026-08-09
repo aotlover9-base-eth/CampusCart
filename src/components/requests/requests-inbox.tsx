@@ -57,7 +57,7 @@ export function RequestsInbox() {
   const router = useRouter()
   const toast = useToast()
 
-  const [tab, setTab] = useState<Tab>('offers')
+  const [tab] = useState<Tab>('offers')
   const [offers, setOffers] = useState<Offer[]>([])
   const [requests, setRequests] = useState<PhoneRequest[]>([])
   const [loading, setLoading] = useState(true)
@@ -102,7 +102,7 @@ export function RequestsInbox() {
       )
       toast.success(
         action === 'accept'
-          ? 'Offer accepted — the item is reserved'
+          ? 'Offer accepted - the item is reserved'
           : action === 'counter'
             ? 'Counter sent'
             : 'Offer declined',
@@ -137,33 +137,13 @@ export function RequestsInbox() {
     }
   }
 
-  const pendingOffers = offers.filter((item) => item.status === 'PENDING').length
-  const pendingRequests = requests.filter((item) => item.status === 'PENDING').length
+
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-5 sm:py-7">
       <h1 className="mb-5 text-[22px] font-semibold tracking-[-0.02em] text-[var(--color-ink)] sm:text-[26px]">
-        Requests
+        Offers
       </h1>
-
-      <div
-        role="tablist"
-        aria-label="Request type"
-        className="mb-5 flex gap-1 border-b border-[var(--color-line)]"
-      >
-        <TabButton
-          active={tab === 'offers'}
-          onClick={() => setTab('offers')}
-          label="Offers"
-          count={pendingOffers}
-        />
-        <TabButton
-          active={tab === 'phone'}
-          onClick={() => setTab('phone')}
-          label="Number requests"
-          count={pendingRequests}
-        />
-      </div>
 
       {loading ? (
         <div className="divide-y divide-[var(--color-line)]">
@@ -466,7 +446,7 @@ function CounterSheet({
   const [value, setValue] = useState('')
 
   useEffect(() => {
-    // Seed with the asking price — most counters start from there.
+    // Seed with the asking price - most counters start from there.
     if (offer) setValue(String(Math.round(offer.listing.priceInPaise / 100)))
   }, [offer])
 
@@ -511,43 +491,4 @@ function CounterSheet({
   )
 }
 
-function TabButton({
-  active,
-  onClick,
-  label,
-  count,
-}: {
-  active: boolean
-  onClick: () => void
-  label: string
-  count: number
-}) {
-  return (
-    <button
-      type="button"
-      role="tab"
-      aria-selected={active}
-      onClick={onClick}
-      className={cn(
-        'relative flex items-center gap-1.5 px-4 py-2.5 text-[14px] font-medium transition-colors',
-        active
-          ? 'text-[var(--color-ink)]'
-          : 'text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]',
-      )}
-    >
-      {label}
-      {count > 0 && (
-        <span className="flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[var(--color-danger)] px-1 text-[10px] font-semibold text-white">
-          {count}
-        </span>
-      )}
-      {active && (
-        <motion.span
-          layoutId="requests-tab"
-          transition={{ type: 'spring', stiffness: 500, damping: 40 }}
-          className="absolute inset-x-0 -bottom-px h-[2px] rounded-full bg-[var(--color-ink)]"
-        />
-      )}
-    </button>
-  )
-}
+

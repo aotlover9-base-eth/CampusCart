@@ -30,7 +30,7 @@ import {
 /**
  * Primary navigation.
  *
- * Desktop: a single sticky top bar — Buy, Sell, Chats, Offers & requests, and
+ * Desktop: a single sticky top bar - Buy, Sell, Chats, Offers & requests, and
  * the profile menu.
  * Mobile: a compact top bar for brand and search, plus a bottom tab bar, which
  * is where thumbs actually reach.
@@ -44,7 +44,7 @@ const PRIMARY_LINKS = [
   { href: '/home', label: 'Buy', icon: TagIcon, match: ['/home', '/browse', '/search'] },
   { href: '/sell', label: 'Sell', icon: PlusIcon, match: ['/sell'] },
   { href: '/chats', label: 'Chats', icon: ChatIcon, match: ['/chats'] },
-  { href: '/requests', label: 'Offers & requests', icon: HandshakeIcon, match: ['/requests'] },
+  { href: '/requests', label: 'Offers', icon: HandshakeIcon, match: ['/requests'] },
 ]
 
 export function TopNav() {

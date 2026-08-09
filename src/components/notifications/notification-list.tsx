@@ -159,7 +159,7 @@ export function NotificationList() {
         <EmptyState
           illustration="notification"
           title="Nothing yet"
-          description="Messages, offers, and phone requests show up here."
+          description="Messages and offers show up here."
         />
       ) : (
         <ul className="space-y-1">

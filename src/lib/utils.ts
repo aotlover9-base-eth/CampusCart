@@ -57,7 +57,7 @@ export function formatBytes(bytes: number): string {
   return `${(bytes / 1024 ** 3).toFixed(2)} GB`
 }
 
-/** Initials for avatar fallbacks — at most two letters. */
+/** Initials for avatar fallbacks - at most two letters. */
 export function initials(fullName: string): string {
   const parts = fullName.trim().split(/\s+/).filter(Boolean)
   if (parts.length === 0) return '?'

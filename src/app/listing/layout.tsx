@@ -12,7 +12,7 @@ import { MobileTabBar, TopNav } from '@/components/nav/top-nav'
  * an account. `getSessionUser` may return null, and the nav renders a "Sign in"
  * button in that case.
  *
- * The providers are what make this necessary — the detail page calls `useToast`,
+ * The providers are what make this necessary - the detail page calls `useToast`,
  * and without a provider above it every listing page throws.
  */
 export default async function ListingLayout({ children }: { children: ReactNode }) {
@@ -25,7 +25,7 @@ export default async function ListingLayout({ children }: { children: ReactNode 
           <TopNav />
 
           {/* Bottom padding clears the mobile tab bar, which only renders when
-              signed in — anonymous visitors get no wasted space. */}
+              signed in - anonymous visitors get no wasted space. */}
           <main className={user ? 'flex-1 pb-[calc(var(--nav-height-mobile)+16px)] md:pb-10' : 'flex-1 pb-10'}>
             {children}
           </main>

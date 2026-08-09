@@ -16,8 +16,8 @@ import {
 } from '@/lib/listings'
 
 /**
- * GET  /api/listings — the marketplace feed, with filters, sort, and pagination
- * POST /api/listings — create a listing
+ * GET  /api/listings - the marketplace feed, with filters, sort, and pagination
+ * POST /api/listings - create a listing
  */
 
 export async function GET(request: Request): Promise<NextResponse> {
@@ -268,7 +268,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       })
     }
 
-    // Approval gating is a flag, default off — listings publish instantly.
+    // Approval gating is a flag, default off - listings publish instantly.
     const approvalRequired = env().FEATURE_LISTING_APPROVAL
     const status = !body.publish
       ? 'DRAFT'

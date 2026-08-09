@@ -1,7 +1,7 @@
 import type { SVGProps } from 'react'
 
 /**
- * Category icons — geometric, minimal, and 20×20 on a 24×24 viewBox for
+ * Category icons - geometric, minimal, and 20×20 on a 24×24 viewBox for
  * consistent optical weight across the category picker.
  */
 

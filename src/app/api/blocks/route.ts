@@ -5,9 +5,9 @@ import { requireUser } from '@/lib/auth/context'
 import { db } from '@/lib/db'
 
 /**
- * GET    /api/blocks — who the caller has blocked
- * POST   /api/blocks — block a user
- * DELETE /api/blocks?userId= — unblock
+ * GET    /api/blocks - who the caller has blocked
+ * POST   /api/blocks - block a user
+ * DELETE /api/blocks?userId= - unblock
  *
  * A block is one-directional in storage but symmetric in effect: `isBlockedBetween`
  * checks both directions, so neither party can message the other afterwards.

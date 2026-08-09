@@ -1,7 +1,7 @@
 /**
  * Magic-byte file type detection.
  *
- * A client-supplied `Content-Type` or filename extension is untrusted input —
+ * A client-supplied `Content-Type` or filename extension is untrusted input -
  * `evil.php` renamed to `photo.jpg` arrives with `image/jpeg`. These checks read
  * the actual file signature and are the only thing the upload path trusts.
  */
@@ -25,19 +25,19 @@ interface Signature {
 }
 
 const SIGNATURES: Signature[] = [
-  // JPEG — FF D8 FF
+  // JPEG - FF D8 FF
   { type: 'image/jpeg', offset: 0, pattern: [0xff, 0xd8, 0xff] },
 
-  // PNG — 89 50 4E 47 0D 0A 1A 0A
+  // PNG - 89 50 4E 47 0D 0A 1A 0A
   { type: 'image/png', offset: 0, pattern: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a] },
 
-  // GIF — "GIF87a" or "GIF89a"
+  // GIF - "GIF87a" or "GIF89a"
   { type: 'image/gif', offset: 0, pattern: [0x47, 0x49, 0x46, 0x38] },
 
-  // WebP — "RIFF" .... "WEBP"
+  // WebP - "RIFF" .... "WEBP"
   { type: 'image/webp', offset: 0, pattern: [0x52, 0x49, 0x46, 0x46] },
 
-  // WebM / Matroska — 1A 45 DF A3
+  // WebM / Matroska - 1A 45 DF A3
   { type: 'video/webm', offset: 0, pattern: [0x1a, 0x45, 0xdf, 0xa3] },
 ]
 
@@ -62,7 +62,7 @@ function matches(buffer: Buffer, signature: Signature): boolean {
 
 /**
  * Detect a file's true type from its leading bytes.
- * Returns null when the type is unrecognised — callers must reject those.
+ * Returns null when the type is unrecognised - callers must reject those.
  */
 export function detectFileType(buffer: Buffer): DetectedType | null {
   if (buffer.length < 12) return null
@@ -80,7 +80,7 @@ export function detectFileType(buffer: Buffer): DetectedType | null {
     if (FTYP_BRANDS[brand]) return FTYP_BRANDS[brand]
     // QuickTime brands often start with "qt".
     if (brand.startsWith('qt')) return 'video/quicktime'
-    // Unknown brand — treat as MP4 only if it looks like a video container.
+    // Unknown brand - treat as MP4 only if it looks like a video container.
     return 'video/mp4'
   }
 

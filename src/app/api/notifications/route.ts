@@ -6,8 +6,8 @@ import { cursorPaginationSchema } from '@/lib/validation'
 import { db } from '@/lib/db'
 
 /**
- * GET   /api/notifications — paginated feed plus unread count
- * PATCH /api/notifications — mark some or all as read
+ * GET   /api/notifications - paginated feed plus unread count
+ * PATCH /api/notifications - mark some or all as read
  */
 
 export async function GET(request: Request): Promise<NextResponse> {

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
  * Terms of use.
  *
  * Written as a starting point that accurately describes what the software
- * actually does. It is not legal advice — have someone qualified review it
+ * actually does. It is not legal advice - have someone qualified review it
  * before the platform handles real transactions at scale.
  */
 export default function TermsPage() {
@@ -51,7 +51,7 @@ export default function TermsPage() {
             'Alcohol, tobacco, drugs, or prescription medication',
             'Weapons, ammunition, or explosives',
             'Live animals',
-            'Academic dishonesty services — assignments, proxy attendance, exam help',
+            'Academic dishonesty services - assignments, proxy attendance, exam help',
             'Counterfeit goods or pirated media',
             'Anything you do not own or are not authorised to sell',
             'Hostel or university property',
@@ -67,7 +67,7 @@ export default function TermsPage() {
         <p>
           Meet in daylight, in a public part of campus, and tell a friend where you
           are going. Inspect an item before you pay for it. If a deal feels wrong,
-          walk away — no listing is worth your safety.
+          walk away - no listing is worth your safety.
         </p>
         <p>
           We verify phone numbers and show a badge for verified VIT email

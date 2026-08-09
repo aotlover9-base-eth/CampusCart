@@ -9,9 +9,9 @@ import { viewerFingerprint } from '@/lib/crypto'
 import { listingCardSelect, serializeListingCard, viewerInteractions } from '@/lib/listings'
 
 /**
- * GET    /api/listings/[listingId] — full detail, records a deduped view
- * PATCH  /api/listings/[listingId] — seller edits
- * DELETE /api/listings/[listingId] — soft delete by the seller
+ * GET    /api/listings/[listingId] - full detail, records a deduped view
+ * PATCH  /api/listings/[listingId] - seller edits
+ * DELETE /api/listings/[listingId] - soft delete by the seller
  */
 
 interface Props {
@@ -65,7 +65,7 @@ export async function GET(_request: Request, props: Props): Promise<NextResponse
         availabilityNote: listing.availabilityNote,
         chatCount: listing.chatCount,
         updatedAt: listing.updatedAt,
-        // Precise coordinates are shared only once the listing is open — the
+        // Precise coordinates are shared only once the listing is open - the
         // feed never carries them.
         latitude: listing.latitude,
         longitude: listing.longitude,
@@ -108,7 +108,7 @@ async function recordView(listingId: string, viewerId: string | undefined): Prom
       data: { viewCount: { increment: 1 } },
     })
   } catch {
-    // Unique violation — already counted today.
+    // Unique violation - already counted today.
   }
 }
 

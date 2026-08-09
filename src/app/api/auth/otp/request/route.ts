@@ -9,7 +9,7 @@ import { db } from '@/lib/db'
  * POST /api/auth/otp/request
  *
  * Issues a verification code. Deliberately does not reveal whether an account
- * exists — the response is identical either way, so this endpoint cannot be used
+ * exists - the response is identical either way, so this endpoint cannot be used
  * to enumerate registered phone numbers.
  */
 export async function POST(request: Request): Promise<NextResponse> {
@@ -17,11 +17,12 @@ export async function POST(request: Request): Promise<NextResponse> {
     const body = await parseBody(request, requestOtpSchema)
     const { ip } = await requestMeta()
 
-    const destination = body.channel === 'SMS' ? body.phone! : body.email!
+    const channel = body.channel ?? 'EMAIL'
+    const destination = body.email!
 
     // Block OTPs to banned or suspended accounts outright.
     const existing = await db.user.findFirst({
-      where: body.channel === 'SMS' ? { phone: destination } : { email: destination },
+      where: { email: destination, deletedAt: null },
       select: { status: true, suspendedTill: true },
     })
 
@@ -38,7 +39,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
 
     const result = await issueOtp({
-      channel: body.channel,
+      channel,
       purpose: body.purpose,
       destination,
       ip,

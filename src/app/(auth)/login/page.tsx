@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 }
 
 export default async function LoginPage() {
-  // Already signed in — no reason to show the form again.
+  // Already signed in - no reason to show the form again.
   const user = await getSessionUser()
   if (user) redirect('/home')
 

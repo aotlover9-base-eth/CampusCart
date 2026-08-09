@@ -5,8 +5,8 @@ import { auditLog, requireAdmin, requireAdminRole } from '@/lib/admin/auth'
 import { db } from '@/lib/db'
 
 /**
- * GET   /api/admin/settings — site settings, feature flags, announcements
- * PATCH /api/admin/settings — update any of the three
+ * GET   /api/admin/settings - site settings, feature flags, announcements
+ * PATCH /api/admin/settings - update any of the three
  *
  * Settings are stored as key/value rows rather than columns so a new toggle is
  * a seed entry, not a migration.
@@ -66,7 +66,7 @@ const patchSchema = z.object({
 
 export async function PATCH(request: Request): Promise<NextResponse> {
   return mutation(async () => {
-    // Site configuration is SUPER_ADMIN only — these switches affect everyone.
+    // Site configuration is SUPER_ADMIN only - these switches affect everyone.
     const admin = await requireAdminRole()
     const body = await parseBody(request, patchSchema)
 

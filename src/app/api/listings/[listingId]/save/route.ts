@@ -4,8 +4,8 @@ import { requireUser } from '@/lib/auth/context'
 import { db } from '@/lib/db'
 
 /**
- * POST   /api/listings/[listingId]/save — save to the user's collection
- * DELETE /api/listings/[listingId]/save — unsave
+ * POST   /api/listings/[listingId]/save - save to the user's collection
+ * DELETE /api/listings/[listingId]/save - unsave
  *
  * Saving is private: unlike a like, it never notifies the seller.
  */

@@ -17,17 +17,6 @@ import { Input, Textarea } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { ArrowLeftIcon, CheckIcon, MapPinIcon } from '@/components/ui/icons'
 
-/**
- * Signup completion, in three steps.
- *
- * Split because the location fields are role-dependent and asking everything at
- * once produces a form nobody finishes. Each step validates locally before
- * advancing, so the single API call at the end rarely fails.
- *
- * The avatar is uploaded *after* the account exists — /api/upload requires an
- * authenticated user, and complete-profile is what signs the user in.
- */
-
 type Step = 'identity' | 'role' | 'location'
 
 interface CompleteProfileResult {
@@ -37,16 +26,16 @@ interface CompleteProfileResult {
 }
 
 export function OnboardingForm({
-  phone,
+  email,
   nextPath,
 }: {
-  phone: string
+  email: string
   nextPath: string | null
 }) {
   const [step, setStep] = useState<Step>('identity')
 
   const [fullName, setFullName] = useState('')
-  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [department, setDepartment] = useState('')
   const [year, setYear] = useState('')
   const [bio, setBio] = useState('')
@@ -71,11 +60,19 @@ export function OnboardingForm({
   const [error, setError] = useState<string | null>(null)
   const [fields, setFields] = useState<Record<string, string>>({})
 
-  const identityValid = fullName.trim().length >= 2
+  // Strict Password Checkers
+  const hasMinLength = password.length >= 8
+  const hasUppercase = /[A-Z]/.test(password)
+  const hasLowercase = /[a-z]/.test(password)
+  const hasNumber = /[0-9]/.test(password)
+  const hasSymbol = /[^a-zA-Z0-9]/.test(password)
+  const isPasswordValid = hasMinLength && hasUppercase && hasLowercase && hasNumber && hasSymbol
+
+  const identityValid = fullName.trim().length >= 2 && isPasswordValid
+
   const canSubmit = useMemo(() => {
     if (!role) return false
     if (role === 'HOSTELLER') return block.trim().length > 0
-    // Day scholars and others need at least one usable locator.
     return Boolean(coords) || mapsUrl.trim().length > 0 || address.trim().length > 0
   }, [role, block, coords, mapsUrl, address])
 
@@ -124,10 +121,10 @@ export function OnboardingForm({
       await api<CompleteProfileResult>('/api/auth/complete-profile', {
         method: 'POST',
         body: {
-          phone,
+          email,
+          password,
           fullName: fullName.trim(),
           role,
-          ...(email.trim() ? { email: email.trim() } : {}),
           ...(department ? { department } : {}),
           ...(year ? { year: Number(year) } : {}),
           ...(bio.trim() ? { bio: bio.trim() } : {}),
@@ -152,8 +149,6 @@ export function OnboardingForm({
         },
       })
 
-      // The account now exists and the session cookie is set, so the avatar can
-      // be uploaded. A failure here is not worth blocking signup over.
       if (avatarFile) {
         try {
           const form = new FormData()
@@ -170,7 +165,7 @@ export function OnboardingForm({
             await api('/api/user/me', { method: 'PATCH', body: { avatarUrl: url } })
           }
         } catch {
-          // Photo can be added later from settings.
+          // Photo can be uploaded later.
         }
       }
 
@@ -179,11 +174,10 @@ export function OnboardingForm({
       if (caught instanceof ApiError) {
         setError(caught.message)
         if (caught.fields) setFields(caught.fields)
-        // Send the user back to whichever step owns the invalid field.
         const bad = Object.keys(caught.fields ?? {})
         if (bad.some((key) => key.startsWith('hostelLocation') || key.startsWith('geoLocation'))) {
           setStep('location')
-        } else if (bad.some((key) => ['fullName', 'email', 'department', 'year'].includes(key))) {
+        } else if (bad.some((key) => ['fullName', 'email', 'password', 'department', 'year'].includes(key))) {
           setStep('identity')
         }
       } else {
@@ -203,10 +197,10 @@ export function OnboardingForm({
         {step === 'identity' && (
           <StepShell key="identity">
             <h1 className="text-[26px] font-semibold tracking-[-0.025em] text-[var(--color-ink)]">
-              Tell us who you are
+              Create your profile & password
             </h1>
             <p className="mt-1.5 text-[14px] text-[var(--color-ink-muted)]">
-              This is what other students see next to your listings.
+              Enter your name and set a secure password for fast future logins.
             </p>
 
             <div className="mt-6 space-y-4">
@@ -247,18 +241,31 @@ export function OnboardingForm({
 
               <Input
                 type="email"
-                label="VIT email (optional)"
-                autoComplete="email"
-                placeholder="you@vitbhopal.ac.in"
+                label="Verified Email"
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                error={fields.email}
-                hint={
-                  !fields.email
-                    ? 'Verify it later to get the VIT badge on your profile.'
-                    : undefined
-                }
+                disabled
+                hint="Your email address has been verified via OTP."
               />
+
+              <div className="space-y-1.5">
+                <Input
+                  type="password"
+                  label="Create Password"
+                  placeholder="Set a strong password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  error={fields.password}
+                />
+
+                <div className="rounded-[10px] bg-[var(--color-surface-sunken)] p-3 text-[12px] space-y-1">
+                  <p className="font-medium text-[var(--color-ink)] mb-1">Password Requirements:</p>
+                  <RuleItem met={hasMinLength} text="At least 8 characters long" />
+                  <RuleItem met={hasUppercase} text="At least 1 Capital letter (A-Z)" />
+                  <RuleItem met={hasLowercase} text="At least 1 Small letter (a-z)" />
+                  <RuleItem met={hasNumber} text="At least 1 Number (0-9)" />
+                  <RuleItem met={hasSymbol} text="At least 1 Special symbol (@, #, $, !, %, etc.)" />
+                </div>
+              </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <Select
@@ -486,6 +493,19 @@ export function OnboardingForm({
           </StepShell>
         )}
       </AnimatePresence>
+    </div>
+  )
+}
+
+function RuleItem({ met, text }: { met: boolean; text: string }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <span className={cn('text-[11px] font-bold', met ? 'text-[var(--color-success)]' : 'text-[var(--color-ink-subtle)]')}>
+        {met ? '✓' : '•'}
+      </span>
+      <span className={met ? 'text-[var(--color-ink)] font-medium' : 'text-[var(--color-ink-muted)]'}>
+        {text}
+      </span>
     </div>
   )
 }

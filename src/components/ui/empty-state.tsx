@@ -1,7 +1,7 @@
 import type { SVGProps } from 'react'
 
 /**
- * Empty-state illustrations — simple, geometric, and thematically consistent.
+ * Empty-state illustrations - simple, geometric, and thematically consistent.
  * Used when a list, search, or feed has no data to show.
  */
 

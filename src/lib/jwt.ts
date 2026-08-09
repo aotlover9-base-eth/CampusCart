@@ -6,7 +6,7 @@ import { env } from './env'
  * Node and in the Edge proxy.
  *
  * Access tokens are short-lived and carry identity claims. Refresh tokens are
- * opaque random strings stored hashed in the database — not JWTs — so they can
+ * opaque random strings stored hashed in the database - not JWTs - so they can
  * be revoked server-side. See src/lib/auth/session.ts.
  */
 

@@ -10,7 +10,7 @@ import { XIcon } from '@/components/ui/icons'
  * Overlay surface: a bottom sheet on mobile, a centred dialog from `sm` up.
  *
  * One component for both because the content is identical and only the entrance
- * differs — a sheet rising from the bottom edge is the native-feeling gesture on
+ * differs - a sheet rising from the bottom edge is the native-feeling gesture on
  * a phone, while a centred card is right on a desktop.
  *
  * Handles the three things every dialog needs and most get wrong: focus moves
@@ -145,7 +145,7 @@ export function Sheet({
                 SIZES[size],
               )}
             >
-              {/* Drag affordance — visual only; Escape and the backdrop close it. */}
+              {/* Drag affordance - visual only; Escape and the backdrop close it. */}
               <div className="flex justify-center pt-2.5 sm:hidden" aria-hidden="true">
                 <span className="h-1 w-9 rounded-full bg-[var(--color-line-strong)]" />
               </div>

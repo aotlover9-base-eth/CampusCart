@@ -19,7 +19,7 @@ const scrypt = promisify(scryptCb) as (
 /**
  * Password and token hashing.
  *
- * Uses Node's built-in scrypt — memory-hard, no native compilation, and
+ * Uses Node's built-in scrypt - memory-hard, no native compilation, and
  * available on every serverless runtime. Parameters follow current OWASP
  * guidance (N=2^16, r=8, p=1).
  */
@@ -52,7 +52,7 @@ export async function hashPassword(password: string): Promise<string> {
 
 /**
  * Verify a password against a stored hash. Constant-time, and never throws on
- * a malformed stored value — it just returns false.
+ * a malformed stored value - it just returns false.
  */
 export async function verifyPassword(
   password: string,
@@ -85,7 +85,7 @@ export async function verifyPassword(
 /**
  * Fast hash for high-volume, low-entropy-independent secrets: refresh tokens,
  * OTP codes, and session identifiers. These are already random with full
- * entropy, so a slow KDF buys nothing — SHA-256 prevents a database leak from
+ * entropy, so a slow KDF buys nothing - SHA-256 prevents a database leak from
  * yielding usable tokens.
  */
 export function hashToken(token: string): string {
@@ -132,7 +132,7 @@ export function viewerFingerprint(ip: string | null, userAgent: string | null): 
     .slice(0, 32)
 }
 
-/** Random code for referrals and share links — unambiguous characters only. */
+/** Random code for referrals and share links - unambiguous characters only. */
 export function shortCode(length = 8): string {
   const alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'
   let out = ''

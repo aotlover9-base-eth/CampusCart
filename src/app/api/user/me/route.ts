@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { handler, mutation, ok, parseBody } from '@/lib/api'
+import { fail, handler, mutation, ok, parseBody } from '@/lib/api'
 import { requireUser } from '@/lib/auth/context'
 import { getSessionUser } from '@/lib/auth/session-user'
 import {
@@ -8,13 +8,14 @@ import {
   fullNameSchema,
   geoLocationSchema,
   hostelLocationSchema,
+  phoneSchema,
   yearSchema,
 } from '@/lib/validation'
 import { db } from '@/lib/db'
 
 /**
- * GET   /api/user/me — the signed-in user's own profile
- * PATCH /api/user/me — update profile, settings, or pickup location
+ * GET   /api/user/me - the signed-in user's own profile
+ * PATCH /api/user/me - update profile, settings, or pickup location
  *
  * Separate from /api/user/[userId], which is the redacted public view. Here the
  * caller is the subject, so their own phone and exact location are fair game.
@@ -22,6 +23,7 @@ import { db } from '@/lib/db'
 
 const updateSchema = z.object({
   fullName: fullNameSchema.optional(),
+  phone: phoneSchema.nullable().optional(),
   department: departmentSchema,
   year: yearSchema,
   bio: z.string().trim().max(280).nullable().optional(),
@@ -68,9 +70,22 @@ export async function PATCH(request: Request): Promise<NextResponse> {
     const auth = await requireUser()
     const body = await parseBody(request, updateSchema)
 
+    if (body.phone) {
+      const taken = await db.user.findFirst({
+        where: { phone: body.phone, id: { not: auth.id }, deletedAt: null },
+        select: { id: true },
+      })
+      if (taken) {
+        return fail('That phone number is already linked to another account.', 409, {
+          phone: 'Already in use',
+        })
+      }
+    }
+
     await db.$transaction(async (tx) => {
       const profileFields = {
         ...(body.fullName !== undefined ? { fullName: body.fullName } : {}),
+        ...(body.phone !== undefined ? { phone: body.phone, phoneVerifiedAt: body.phone ? new Date() : null } : {}),
         ...(body.department !== undefined ? { department: body.department } : {}),
         ...(body.year !== undefined ? { year: body.year } : {}),
         ...(body.bio !== undefined ? { bio: body.bio } : {}),

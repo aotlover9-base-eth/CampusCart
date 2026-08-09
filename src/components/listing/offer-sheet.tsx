@@ -13,7 +13,7 @@ import { useToast } from '@/components/ui/toast'
  * Make-an-offer sheet.
  *
  * An accepted offer reserves the listing, so this deliberately shows how far
- * below asking the number is — a lowball should feel like a choice, not a slip.
+ * below asking the number is - a lowball should feel like a choice, not a slip.
  * On success the buyer lands in the thread the offer created.
  */
 export function OfferSheet({

@@ -9,7 +9,7 @@ import { notify } from '@/lib/notifications'
 import { publish } from '@/lib/realtime'
 
 /**
- * POST /api/offers/[offerId] — respond to or withdraw an offer.
+ * POST /api/offers/[offerId] - respond to or withdraw an offer.
  *
  * Sellers accept, reject, or counter. Buyers may only withdraw their own.
  * Accepting reserves the listing rather than marking it sold: money and
@@ -75,7 +75,7 @@ export async function POST(request: Request, props: Props): Promise<NextResponse
     }[body.action] as 'ACCEPTED' | 'REJECTED' | 'COUNTERED' | 'WITHDRAWN'
 
     const systemBody = {
-      accept: `Offer accepted — ${formatPrice(offer.amountInPaise)}`,
+      accept: `Offer accepted - ${formatPrice(offer.amountInPaise)}`,
       reject: 'Offer declined',
       counter: `Countered with ${counterInPaise ? formatPrice(counterInPaise) : ''}`,
       withdraw: 'Offer withdrawn',

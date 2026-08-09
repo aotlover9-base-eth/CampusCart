@@ -12,7 +12,7 @@ import { temporaryId, type ChatMessage } from './types'
 /**
  * Message input.
  *
- * Sends optimistically — the parent renders the bubble before the request
+ * Sends optimistically - the parent renders the bubble before the request
  * resolves. Typing frames are throttled to one every few seconds rather than
  * one per keystroke; the indicator only needs to be roughly right.
  */

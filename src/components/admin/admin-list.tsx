@@ -10,7 +10,7 @@ import { SearchIcon } from '@/components/ui/icons'
 /**
  * Paginated admin list.
  *
- * Every admin section is the same shape — filter, fetch, page, act on a row —
+ * Every admin section is the same shape - filter, fetch, page, act on a row -
  * so the fetching, cursor handling, debounced search, and refresh-after-action
  * live here once and each section supplies only its filters and row renderer.
  */

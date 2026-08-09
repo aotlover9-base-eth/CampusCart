@@ -53,14 +53,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: listing.title,
     description: `${price} · ${listing.description.slice(0, 150)}`,
     openGraph: {
-      title: `${listing.title} — ${price}`,
+      title: `${listing.title} - ${price}`,
       description: listing.description.slice(0, 200),
       images: [{ url: image }],
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${listing.title} — ${price}`,
+      title: `${listing.title} - ${price}`,
       images: [image],
     },
   }
@@ -172,6 +172,6 @@ async function recordView(listingId: string, viewerId: string | undefined): Prom
       data: { viewCount: { increment: 1 } },
     })
   } catch {
-    // Unique violation — already counted today.
+    // Unique violation - already counted today.
   }
 }

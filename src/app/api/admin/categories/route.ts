@@ -8,10 +8,10 @@ import { slugify } from '@/lib/utils'
 import { db } from '@/lib/db'
 
 /**
- * GET    /api/admin/categories — the full tree, including hidden nodes
- * POST   /api/admin/categories — create a category or subcategory
- * PATCH  /api/admin/categories — rename, reorder, show/hide
- * DELETE /api/admin/categories — remove an empty category
+ * GET    /api/admin/categories - the full tree, including hidden nodes
+ * POST   /api/admin/categories - create a category or subcategory
+ * PATCH  /api/admin/categories - rename, reorder, show/hide
+ * DELETE /api/admin/categories - remove an empty category
  */
 
 export async function GET(): Promise<NextResponse> {
@@ -114,7 +114,7 @@ export async function PATCH(request: Request): Promise<NextResponse> {
     })
     if (!before) return fail('Category not found', 404)
 
-    // The slug is a stable public identifier — renaming the label must not
+    // The slug is a stable public identifier - renaming the label must not
     // break links or bookmarks, so the slug stays put.
     await db.category.update({ where: { id: categoryId }, data: changes })
 

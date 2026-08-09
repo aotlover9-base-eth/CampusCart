@@ -3,13 +3,13 @@
  *
  * Deliberately simple: a Map of channel → subscriber callbacks, living in the
  * Node process. That is correct for a single instance and for `next dev`, and
- * it degrades safely rather than silently — see the note below.
+ * it degrades safely rather than silently - see the note below.
  *
  * Scaling past one instance means swapping the two functions here for a Redis
  * pub/sub client (or setting REALTIME_DRIVER=socketio and running a dedicated
  * server). Every caller goes through `publish` and `subscribe`, so nothing else
  * changes. Until then, a second instance simply means clients on instance A do
- * not see instance B's events live — they still get them on the next poll or
+ * not see instance B's events live - they still get them on the next poll or
  * navigation, because the database remains the source of truth.
  */
 

@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
  * Two series over time → multi-line, categorical colour. The palette is the
  * project accent plus a validated orange; both slots clear the lightness band,
  * chroma floor, CVD separation, normal-vision floor, and 3:1 contrast against
- * the light and dark surfaces. Identity is never colour-alone — each line is
+ * the light and dark surfaces. Identity is never colour-alone - each line is
  * direct-labelled and there is a table view.
  *
  * Hand-rolled SVG rather than a charting library: two polylines and a crosshair
@@ -113,7 +113,7 @@ export function TrendChart({ points }: { points: DailyPoint[] }) {
             onMouseMove={handleMove}
             onMouseLeave={() => setHover(null)}
           >
-            {/* Recessive gridlines — three is enough to read a value against. */}
+            {/* Recessive gridlines - three is enough to read a value against. */}
             {[0, 0.5, 1].map((fraction) => {
               const y = PAD.top + plot.innerH * fraction
               return (

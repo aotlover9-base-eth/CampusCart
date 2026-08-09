@@ -33,7 +33,7 @@ export function OfferCard({
   const [counterOpen, setCounterOpen] = useState(false)
   const [counterValue, setCounterValue] = useState('')
 
-  // A malformed row shouldn't blank the thread — fall back to the note.
+  // A malformed row shouldn't blank the thread - fall back to the note.
   if (!offer) {
     return (
       <p className="whitespace-pre-wrap break-words px-3.5 py-2">
@@ -59,7 +59,7 @@ export function OfferCard({
       })
       toast.success(
         {
-          accept: 'Offer accepted — the item is reserved',
+          accept: 'Offer accepted - the item is reserved',
           reject: 'Offer declined',
           counter: 'Counter sent',
           withdraw: 'Offer withdrawn',

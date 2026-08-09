@@ -8,7 +8,7 @@ import { db } from '@/lib/db'
  * POST /api/auth/logout
  *
  * Revokes the refresh token server-side and clears both cookies. Always
- * succeeds — logging out must never fail from the user's point of view.
+ * succeeds - logging out must never fail from the user's point of view.
  */
 export async function POST(): Promise<NextResponse> {
   return mutation(async () => {

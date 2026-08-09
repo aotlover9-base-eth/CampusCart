@@ -7,7 +7,7 @@ import { ThemeToggle } from '@/components/theme/theme-toggle'
 /**
  * Auth shell.
  *
- * Two panes on large screens — form on the left, artwork on the right. The
+ * Two panes on large screens - form on the left, artwork on the right. The
  * artwork pane is decorative, so it is hidden from assistive tech and dropped
  * entirely on small screens where vertical space belongs to the form.
  */

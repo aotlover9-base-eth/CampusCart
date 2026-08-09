@@ -9,8 +9,8 @@ import { notify } from '@/lib/notifications'
 import { publish } from '@/lib/realtime'
 
 /**
- * GET  /api/phone-requests — requests the caller sent or received
- * POST /api/phone-requests — ask a seller for their number
+ * GET  /api/phone-requests - requests the caller sent or received
+ * POST /api/phone-requests - ask a seller for their number
  *
  * A number is never returned by this route. Only the accepted-request check in
  * /api/user/[userId]/phone releases it, so a leak would need two independent

@@ -13,7 +13,7 @@ import { CategoryIcon } from '@/components/brand/icons'
 /**
  * Category management.
  *
- * Categories are hidden rather than deleted once they hold listings — the API
+ * Categories are hidden rather than deleted once they hold listings - the API
  * refuses a delete that would orphan rows, and the UI offers hide in its place.
  */
 

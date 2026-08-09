@@ -162,7 +162,7 @@ export function ListingGallery({
           <motion.div
             role="dialog"
             aria-modal="true"
-            aria-label={`${title} — full screen image`}
+            aria-label={`${title} - full screen image`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

@@ -6,7 +6,7 @@ import { db } from '@/lib/db'
 import { publish } from '@/lib/realtime'
 
 /**
- * POST /api/realtime/typing — broadcast a typing indicator.
+ * POST /api/realtime/typing - broadcast a typing indicator.
  *
  * Fire-and-forget and intentionally not persisted: a typing state that outlives
  * the request is worse than none. The client re-posts every few seconds while
@@ -14,7 +14,7 @@ import { publish } from '@/lib/realtime'
  *
  * Goes through `mutation` like every other write. The blast radius of a forged
  * typing frame is small, but "small" is not a reason for one route to be the
- * exception — a uniform rule is what makes the rule checkable.
+ * exception - a uniform rule is what makes the rule checkable.
  */
 
 const schema = z.object({

@@ -7,9 +7,9 @@ import { conversationListSelect, serializeConversation } from '@/lib/conversatio
 import { publish } from '@/lib/realtime'
 
 /**
- * GET    /api/conversations/[conversationId] — thread metadata
- * PATCH  /api/conversations/[conversationId] — archive, mute, or mark read
- * DELETE /api/conversations/[conversationId] — clear history for the caller
+ * GET    /api/conversations/[conversationId] - thread metadata
+ * PATCH  /api/conversations/[conversationId] - archive, mute, or mark read
+ * DELETE /api/conversations/[conversationId] - clear history for the caller
  *
  * Every mutation here is one-sided: archiving, muting, and clearing affect only
  * the member row of the caller, never the other participant's view.

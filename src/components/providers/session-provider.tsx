@@ -8,7 +8,7 @@ import type { SessionUser } from '@/lib/auth/context'
 /**
  * Client-side view of the signed-in user.
  *
- * Seeded from the server on first render — no loading flash, no request on
+ * Seeded from the server on first render - no loading flash, no request on
  * mount. `refresh()` re-reads /api/auth/me after a profile edit; `patch()`
  * applies an optimistic local change for things like an avatar swap.
  */
@@ -52,7 +52,7 @@ export function SessionProvider({
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
 }
 
-/** Throws outside the provider — a missing provider is a bug, not a state. */
+/** Throws outside the provider - a missing provider is a bug, not a state. */
 export function useSession(): SessionContextValue {
   const context = useContext(SessionContext)
   if (!context) {

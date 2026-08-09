@@ -34,7 +34,7 @@ import {
 /**
  * Listing detail.
  *
- * Two columns on desktop — gallery left, a sticky action rail right. On mobile
+ * Two columns on desktop - gallery left, a sticky action rail right. On mobile
  * the rail collapses into a fixed bottom bar so the primary action stays in
  * reach while the description scrolls.
  */
@@ -139,12 +139,12 @@ export function ListingDetail({
     const url = window.location.href
     const shareData = {
       title: listing.title,
-      text: `${listing.title} — ${listing.isFree ? 'Free' : formatPrice(listing.priceInPaise)} on CampusCart`,
+      text: `${listing.title} - ${listing.isFree ? 'Free' : formatPrice(listing.priceInPaise)} on CampusCart`,
       url,
     }
 
     // The Web Share sheet is the native path on mobile; clipboard is the
-    // desktop fallback. A dismissed share sheet throws AbortError — not an error
+    // desktop fallback. A dismissed share sheet throws AbortError - not an error
     // worth surfacing.
     if (navigator.share) {
       try {
@@ -220,7 +220,7 @@ export function ListingDetail({
           <section className="mt-7">
             <h2 className="text-[15px] font-semibold text-[var(--color-ink)]">Description</h2>
             {/* whitespace-pre-wrap preserves the seller's line breaks without
-                letting any markup through — this is plain text, not HTML. */}
+                letting any markup through - this is plain text, not HTML. */}
             <p className="mt-2.5 whitespace-pre-wrap text-[14.5px] leading-relaxed text-[var(--color-ink-muted)]">
               {listing.description}
             </p>
@@ -319,7 +319,7 @@ export function ListingDetail({
                   {seller.fullName}
                 </p>
                 <p className="truncate text-[12.5px] text-[var(--color-ink-muted)]">
-                  {[ROLE_LABELS[seller.role], seller.department].filter(Boolean).join(' · ') ||
+                  {[ROLE_LABELS[seller.role], seller.department?.replaceAll('—', '-')].filter(Boolean).join(' · ') ||
                     'Member'}
                 </p>
               </div>
@@ -511,7 +511,7 @@ function BuyerActions({
   busy: boolean
   compact?: boolean
   contactPreference: string
-  /** Negotiable, non-free listings only — nothing to haggle over otherwise. */
+  /** Negotiable, non-free listings only - nothing to haggle over otherwise. */
   canOffer: boolean
   onChat: () => void
   onRequestPhone: () => void

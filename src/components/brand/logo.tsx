@@ -20,7 +20,7 @@ export function LogoMark(props: SVGProps<SVGSVGElement>) {
       aria-hidden="true"
       {...props}
     >
-      {/* Handle — the open stroke leading into the basket */}
+      {/* Handle - the open stroke leading into the basket */}
       <path
         d="M4 6h3.2a2 2 0 0 1 1.94 1.51L9.6 9.5"
         stroke="currentColor"
@@ -28,7 +28,7 @@ export function LogoMark(props: SVGProps<SVGSVGElement>) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      {/* Basket — a rounded trapezoid, the primary silhouette */}
+      {/* Basket - a rounded trapezoid, the primary silhouette */}
       <path
         d="M9.6 9.5h16.2a1.6 1.6 0 0 1 1.56 1.96l-1.72 7.4a3.2 3.2 0 0 1-3.12 2.48H13.3a3.2 3.2 0 0 1-3.13-2.55L8.1 8.9"
         stroke="currentColor"

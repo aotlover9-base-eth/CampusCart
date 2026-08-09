@@ -15,8 +15,8 @@ import { notifyNewMessage } from '@/lib/notifications'
 import { publish } from '@/lib/realtime'
 
 /**
- * GET  /api/conversations/[conversationId]/messages — thread history
- * POST /api/conversations/[conversationId]/messages — send a message
+ * GET  /api/conversations/[conversationId]/messages - thread history
+ * POST /api/conversations/[conversationId]/messages - send a message
  *
  * History is newest-first for cursor pagination, then reversed for display, so
  * "load older" fetches a page without re-reading the whole thread.

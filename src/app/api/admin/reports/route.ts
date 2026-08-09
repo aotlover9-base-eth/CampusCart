@@ -6,8 +6,8 @@ import { cursorPaginationSchema } from '@/lib/validation'
 import { db } from '@/lib/db'
 
 /**
- * GET   /api/admin/reports — the moderation queue
- * PATCH /api/admin/reports — resolve or dismiss a report
+ * GET   /api/admin/reports - the moderation queue
+ * PATCH /api/admin/reports - resolve or dismiss a report
  */
 
 const querySchema = cursorPaginationSchema.extend({

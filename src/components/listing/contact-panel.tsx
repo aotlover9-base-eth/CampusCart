@@ -23,7 +23,7 @@ import {
 /**
  * Phone-request flow, from the buyer's side.
  *
- * The number is never rendered from props — it is fetched on demand from
+ * The number is never rendered from props - it is fetched on demand from
  * /api/user/[id]/phone, which re-checks the grant. That means a stale page
  * cannot leak a number the seller has since revoked.
  */
@@ -191,7 +191,7 @@ function RequestForm({
       <div className="mt-4">
         <Textarea
           label="Add a note (optional)"
-          placeholder="Hi! Interested in this — can I call you this evening?"
+          placeholder="Hi! Interested in this - can I call you this evening?"
           value={message}
           maxLength={300}
           onChange={(event) => onMessageChange(event.target.value)}
@@ -223,7 +223,7 @@ function Pending() {
         Waiting on the seller
       </h1>
       <p className="mx-auto mt-1.5 max-w-[36ch] text-[13.5px] leading-relaxed text-[var(--color-ink-muted)]">
-        They will get a notification. You will be told as soon as they respond —
+        They will get a notification. You will be told as soon as they respond -
         no need to keep this page open.
       </p>
     </div>

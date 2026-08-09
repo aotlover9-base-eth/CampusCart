@@ -12,7 +12,7 @@ import {
 } from '@/lib/listings'
 
 /**
- * GET /api/search — fuzzy listing search with pg_trgm similarity ranking.
+ * GET /api/search - fuzzy listing search with pg_trgm similarity ranking.
  *
  * The feed's ILIKE filter is fine once a category or filter is active. This
  * route backs the global search bar: it ranks by relevance rather than recency
@@ -32,7 +32,7 @@ const SIMILARITY_THRESHOLD = 0.15
 
 /**
  * Word-extent matches are scored against the best word rather than the whole
- * string, so they run hot compared to `similarity()` — a term sharing a couple of
+ * string, so they run hot compared to `similarity()` - a term sharing a couple of
  * trigrams with any word in a long description clears 0.15 easily. This sits
  * higher so a typo still matches ("chargr" → "charger" ≈ 0.7) without every
  * loosely-related word qualifying.
@@ -49,7 +49,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       return ok({ listings: [], query: term ?? '', total: 0 })
     }
 
-    // Stage 1 — similarity ranking. Prisma's tagged template parameterises
+    // Stage 1 - similarity ranking. Prisma's tagged template parameterises
     // every interpolation, so the search term cannot alter the statement.
     //
     // `similarity()` compares whole strings, which collapses to near-zero when a
@@ -87,7 +87,7 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     const rankOf = new Map(ranked.map((row, index) => [row.id, index]))
 
-    // Stage 2 — filters, all type-safe.
+    // Stage 2 - filters, all type-safe.
     const where: Prisma.ListingWhereInput = {
       ...visibilityWhere(viewer?.id),
       id: { in: ranked.map((r) => r.id) },

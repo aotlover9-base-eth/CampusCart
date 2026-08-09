@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 import { CheckIcon, WarningIcon, XIcon } from '@/components/ui/icons'
 
 /**
- * Toasts for the outcome of a mutation — the only global feedback channel.
+ * Toasts for the outcome of a mutation - the only global feedback channel.
  *
  * Rendered bottom-centre on mobile (above the tab bar) and bottom-right on
  * desktop. Auto-dismiss timers are tracked per toast so an early manual dismiss

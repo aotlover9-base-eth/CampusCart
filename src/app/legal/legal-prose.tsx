@@ -14,7 +14,7 @@ export function LegalDocument({
   children,
 }: {
   title: string
-  /** Absolute date — "recently" is not useful in a legal document. */
+  /** Absolute date - "recently" is not useful in a legal document. */
   updated: string
   summary: string
   children: ReactNode

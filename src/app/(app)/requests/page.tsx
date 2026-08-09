@@ -4,7 +4,7 @@ import { getSessionUser } from '@/lib/auth/session-user'
 import { RequestsInbox } from '@/components/requests/requests-inbox'
 
 export const metadata: Metadata = {
-  title: 'Requests',
+  title: 'Offers',
   robots: { index: false, follow: false },
 }
 

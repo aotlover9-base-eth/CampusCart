@@ -14,7 +14,7 @@ import { ClockIcon, MapPinIcon, SettingsIcon } from '@/components/ui/icons'
  * Public profile with the seller's listings.
  *
  * Two tabs: what they have for sale now, and what they have already sold. The
- * sold tab doubles as a trust signal — a seller with completed sales is a safer
+ * sold tab doubles as a trust signal - a seller with completed sales is a safer
  * bet than a brand-new account.
  */
 
@@ -87,7 +87,7 @@ export function ProfileView({
           <p className="mt-1 text-[13.5px] text-[var(--color-ink-muted)]">
             {[
               user.role ? ROLE_LABELS[user.role] : null,
-              user.department,
+              user.department?.replaceAll('—', '-'),
               user.year ? `Year ${user.year}` : null,
             ]
               .filter(Boolean)

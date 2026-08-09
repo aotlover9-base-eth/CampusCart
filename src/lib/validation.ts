@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 /**
  * Shared zod schemas. Every route handler validates its input through one of
- * these — no handler reads an unparsed body.
+ * these - no handler reads an unparsed body.
  */
 
 /**
@@ -53,39 +53,45 @@ export const yearSchema = z.coerce
   .max(5, 'Year must be between 1 and 5')
   .optional()
 
+export const passwordSchema = z
+  .string()
+  .min(8, 'Password must be at least 8 characters long')
+  .max(128, 'Password is too long')
+  .refine((v) => /[a-z]/.test(v), 'Must contain at least 1 lowercase letter')
+  .refine((v) => /[A-Z]/.test(v), 'Must contain at least 1 uppercase letter')
+  .refine((v) => /[0-9]/.test(v), 'Must contain at least 1 number')
+  .refine(
+    (v) => /[^a-zA-Z0-9]/.test(v),
+    'Must contain at least 1 special character/symbol (@, #, $, !, etc.)',
+  )
+
+export const loginWithPasswordSchema = z.object({
+  email: emailSchema,
+  password: z.string().min(1, 'Enter your password'),
+})
+
 // ── Auth flows ──
 
-export const requestOtpSchema = z
-  .object({
-    channel: z.enum(['SMS', 'EMAIL']),
-    phone: phoneSchema.optional(),
-    email: emailSchema.optional(),
-    purpose: z.enum(['SIGNUP', 'LOGIN', 'PHONE_VERIFY', 'EMAIL_VERIFY']),
-  })
-  .refine(
-    (v) => (v.channel === 'SMS' ? Boolean(v.phone) : Boolean(v.email)),
-    'Provide the destination matching the selected channel',
-  )
+export const requestOtpSchema = z.object({
+  channel: z.enum(['SMS', 'EMAIL']).default('EMAIL'),
+  email: emailSchema,
+  purpose: z.enum(['SIGNUP', 'LOGIN', 'PHONE_VERIFY', 'EMAIL_VERIFY']),
+})
 
-export const verifyOtpSchema = z
-  .object({
-    channel: z.enum(['SMS', 'EMAIL']),
-    phone: phoneSchema.optional(),
-    email: emailSchema.optional(),
-    purpose: z.enum(['SIGNUP', 'LOGIN', 'PHONE_VERIFY', 'EMAIL_VERIFY']),
-    code: otpCodeSchema,
-  })
-  .refine(
-    (v) => (v.channel === 'SMS' ? Boolean(v.phone) : Boolean(v.email)),
-    'Provide the destination matching the selected channel',
-  )
+export const verifyOtpSchema = z.object({
+  channel: z.enum(['SMS', 'EMAIL']).default('EMAIL'),
+  email: emailSchema,
+  purpose: z.enum(['SIGNUP', 'LOGIN', 'PHONE_VERIFY', 'EMAIL_VERIFY']),
+  code: otpCodeSchema,
+})
 
 export const completeProfileSchema = z.object({
   fullName: fullNameSchema,
+  email: emailSchema,
+  password: passwordSchema,
   role: userRoleSchema,
   department: departmentSchema,
   year: yearSchema,
-  email: emailSchema.optional(),
   avatarUrl: z.string().max(500).optional(),
   bio: z.string().trim().max(280).optional(),
 })
@@ -324,7 +330,7 @@ export const feedQuerySchema = z.object({
     }),
 
   /**
-   * Narrows the visible set to one lifecycle state — used by the "Sold" tab on
+   * Narrows the visible set to one lifecycle state - used by the "Sold" tab on
    * a profile. Only states that are already publicly visible are accepted, so
    * this can never widen what `visibilityWhere` allows.
    */

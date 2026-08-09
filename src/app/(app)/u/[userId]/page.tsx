@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  *
  * Respects the subject's privacy settings: role and department appear only if
  * they chose to show them, and the email only if it is verified. The phone
- * number is never included — that is the phone-request flow's job alone.
+ * number is never included - that is the phone-request flow's job alone.
  */
 export default async function ProfilePage({ params }: Props) {
   const { userId } = await params
@@ -84,7 +84,7 @@ export default async function ProfilePage({ params }: Props) {
         listingCount: user.listingCount,
         soldCount: user.soldCount,
         joinedAt: user.createdAt.toISOString(),
-        // Only the block, never the room — that is shared in chat.
+        // Only the block, never the room - that is shared in chat.
         hostelBlock: user.hostelLocation?.block ?? null,
       }}
       isYou={isYou}

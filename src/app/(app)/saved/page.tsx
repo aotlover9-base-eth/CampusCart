@@ -13,7 +13,7 @@ export const metadata: Metadata = {
  * Saved listings.
  *
  * Reuses the shared feed against /api/saved, which returns the same envelope.
- * Unsaving a card drops it from the list immediately — the feed's `onRemoved`
+ * Unsaving a card drops it from the list immediately - the feed's `onRemoved`
  * hook already handles that.
  */
 export default function SavedPage() {

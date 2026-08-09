@@ -16,7 +16,7 @@ import type { SessionMeta } from './session'
 export const ACCESS_COOKIE = 'cc_at'
 export const REFRESH_COOKIE = 'cc_rt'
 export const ADMIN_COOKIE = 'cc_admin'
-/** Readable by client JS on purpose — it is the double-submit CSRF token. */
+/** Readable by client JS on purpose - it is the double-submit CSRF token. */
 export const CSRF_COOKIE = 'cc_csrf'
 
 export interface AuthUser {
@@ -72,7 +72,7 @@ export interface SessionUser {
 
 /**
  * Resolve the signed-in user from the access-token cookie.
- * Returns null when there's no valid token — never throws.
+ * Returns null when there's no valid token - never throws.
  */
 export async function currentUser(): Promise<AuthUser | null> {
   const store = await cookies()

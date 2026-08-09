@@ -11,7 +11,7 @@ import { ImageIcon, PlayIcon, PlusIcon, StarIcon, XIcon } from '@/components/ui/
 /**
  * Drag-and-drop media picker for the sell flow.
  *
- * Images are compressed in the browser before upload — see image-compress for
+ * Images are compressed in the browser before upload - see image-compress for
  * why. Local previews appear the moment files are picked so the grid never
  * looks empty while a slow upload runs.
  */
@@ -82,7 +82,7 @@ export function MediaUploader({
 
       if (rejected > 0) {
         setNotice(
-          `Skipped ${rejected} file${rejected === 1 ? '' : 's'} — limit is ${MAX_IMAGES} photos and ${MAX_VIDEOS} videos.`,
+          `Skipped ${rejected} file${rejected === 1 ? '' : 's'} - limit is ${MAX_IMAGES} photos and ${MAX_VIDEOS} videos.`,
         )
       }
       if (images.length === 0 && videos.length === 0) return
@@ -101,7 +101,7 @@ export function MediaUploader({
           const compressed = await Promise.all(images.map(compressImage))
           settled.push(...(await uploadBatch(compressed, 'image')))
         }
-        // Videos go in their own request — the server caps each kind separately.
+        // Videos go in their own request - the server caps each kind separately.
         if (videos.length > 0) {
           settled.push(...(await uploadBatch(videos, 'video')))
         }

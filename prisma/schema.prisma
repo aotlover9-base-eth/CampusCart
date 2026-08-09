@@ -1,4 +1,4 @@
-// CampusCart — data model
+// CampusCart - data model
 // Covers shipped features plus schema-level room for flagged future work
 // (subscriptions, ratings, payments, wallet, referrals) so those land as
 // additive migrations rather than rewrites.
@@ -171,16 +171,16 @@ model User {
   id       String @id @default(cuid())
   fullName String
 
-  // Phone is mandatory and always verified before an account becomes usable.
-  // It is never exposed through the API unless a PhoneRequest was accepted.
-  phone           String    @unique
-  phoneVerifiedAt DateTime?
-
-  // Email is optional. A verified address on VIT_EMAIL_DOMAIN grants the
+  // Primary identity is email. Verified address on VIT_EMAIL_DOMAIN grants the
   // VIT Verified badge; any other domain verifies the address only.
-  email           String?   @unique
+  email           String    @unique
   emailVerifiedAt DateTime?
+  passwordHash    String?
   isVitVerified   Boolean   @default(false)
+
+  // Phone is optional for legacy support.
+  phone           String?   @unique
+  phoneVerifiedAt DateTime?
 
   role       UserRole
   department String?
@@ -192,7 +192,7 @@ model User {
   statusReason  String?
   suspendedTill DateTime?
 
-  // Denormalised counters — kept in sync on write to avoid feed-time aggregates.
+  // Denormalised counters - kept in sync on write to avoid feed-time aggregates.
   listingCount Int @default(0)
   soldCount    Int @default(0)
 
@@ -262,7 +262,7 @@ model UserSettings {
   @@map("user_settings")
 }
 
-// Hosteller pickup details — block/room level, shown only once a chat exists.
+// Hosteller pickup details - block/room level, shown only once a chat exists.
 model HostelLocation {
   id     String @id @default(cuid())
   userId String @unique
@@ -284,7 +284,7 @@ model HostelLocation {
   @@map("hostel_locations")
 }
 
-// Day scholar / other location — GPS, a pasted Maps link, or a dropped pin.
+// Day scholar / other location - GPS, a pasted Maps link, or a dropped pin.
 model GeoLocation {
   id     String @id @default(cuid())
   userId String @unique
@@ -413,7 +413,7 @@ model Listing {
   contactPreference ContactPreference @default(CHAT_THEN_PHONE)
   availabilityNote  String?
 
-  // Location snapshot at post time — a listing keeps its pickup point even if
+  // Location snapshot at post time - a listing keeps its pickup point even if
   // the seller later moves, and the seller's exact room is never in the feed.
   locationLabel String?
   latitude      Float?
@@ -588,7 +588,7 @@ model Message {
   kind MessageKind @default(TEXT)
   body String?     @db.Text
 
-  // Image messages — compressed client-side, re-encoded server-side.
+  // Image messages - compressed client-side, re-encoded server-side.
   mediaKey       String?
   mediaThumbKey  String?
   mediaWidth     Int?
@@ -869,7 +869,7 @@ model FeatureFlag {
   key         String   @id
   isEnabled   Boolean  @default(false)
   description String?
-  // Optional percentage rollout, 0–100.
+  // Optional percentage rollout, 0-100.
   rolloutPercent Int   @default(100)
   updatedAt   DateTime @updatedAt
 
@@ -939,7 +939,7 @@ model Rating {
   subject   User   @relation("RatingSubject", fields: [subjectId], references: [id], onDelete: Cascade)
 
   listingId String?
-  score     Int // 1–5
+  score     Int // 1-5
   review    String? @db.Text
   isHidden  Boolean @default(false)
 

@@ -51,7 +51,7 @@ export async function notify(input: NotifyInput): Promise<void> {
         select: { [preferenceKey]: true } as Record<string, true>,
       })
 
-      // Absent settings means defaults, which are all on — so only an explicit
+      // Absent settings means defaults, which are all on - so only an explicit
       // `false` suppresses the notification.
       if (settings && (settings as Record<string, boolean>)[preferenceKey] === false) {
         return

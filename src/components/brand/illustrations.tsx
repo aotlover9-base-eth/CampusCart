@@ -1,7 +1,7 @@
 import type { SVGProps } from 'react'
 
 /**
- * Larger brand illustrations — auth screens and media fallbacks.
+ * Larger brand illustrations - auth screens and media fallbacks.
  *
  * These read theme tokens rather than hard-coded hex, so the same file works in
  * both themes. Geometry only: no gradients, no raster, nothing that needs a
@@ -10,7 +10,7 @@ import type { SVGProps } from 'react'
 
 /**
  * Login art: a campus exchange abstracted to two stacked listing cards passing
- * between hands. Deliberately quiet — it sits beside the form, not over it.
+ * between hands. Deliberately quiet - it sits beside the form, not over it.
  */
 export function AuthIllustration(props: SVGProps<SVGSVGElement>) {
   return (
@@ -128,7 +128,7 @@ export function ListingPlaceholder(props: SVGProps<SVGSVGElement>) {
   )
 }
 
-/** Avatar fallback ring — pairs with the `initials()` helper. */
+/** Avatar fallback ring - pairs with the `initials()` helper. */
 export function AvatarRing(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 40 40" fill="none" aria-hidden="true" {...props}>

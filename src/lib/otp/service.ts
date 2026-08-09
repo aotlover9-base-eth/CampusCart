@@ -9,7 +9,7 @@ import { emailProvider, smsProvider } from './providers'
  * OTP issue and verification.
  *
  * Codes are stored as SHA-256 digests, never plaintext. A destination may have
- * only one live code per purpose at a time — requesting a new one invalidates
+ * only one live code per purpose at a time - requesting a new one invalidates
  * the previous. Verification is constant-time and attempt-capped both per row
  * and per destination.
  */
@@ -102,7 +102,7 @@ export async function issueOtp(input: IssueOtpInput): Promise<IssueOtpResult> {
   })
 
   if (!sent.ok) {
-    // Delivery failed — burn the code so a retry issues a fresh one.
+    // Delivery failed - burn the code so a retry issues a fresh one.
     await db.otpCode.updateMany({
       where: { destination, purpose, consumedAt: null },
       data: { consumedAt: new Date() },
@@ -179,7 +179,7 @@ export async function verifyOtp(input: {
     }
   }
 
-  // Success — consume the code so it can't be replayed.
+  // Success - consume the code so it can't be replayed.
   await db.otpCode.update({
     where: { id: record.id },
     data: { consumedAt: new Date() },

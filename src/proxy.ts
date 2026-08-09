@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 /**
  * Edge middleware: route gating, CSRF token issuance, and security headers.
  *
- * Runs on every request, so it stays dependency-free — no Prisma, no env
+ * Runs on every request, so it stays dependency-free - no Prisma, no env
  * validation, no crypto beyond Web Crypto. Auth here is a *presence* check on
  * the access cookie; the signature and the user's ban status are verified in
  * route handlers and server components via `currentUser()`. A forged cookie gets
@@ -16,7 +16,7 @@ const ADMIN_COOKIE = 'cc_admin'
 const CSRF_COOKIE = 'cc_csrf'
 
 /**
- * Signed-in-only prefixes. Everything not listed here is public — `/`, `/login`,
+ * Signed-in-only prefixes. Everything not listed here is public - `/`, `/login`,
  * `/onboarding`, and the shareable `/listing/:id` and `/u/:id` pages all need to
  * work for a visitor arriving from a WhatsApp link.
  */
@@ -182,7 +182,7 @@ export const config = {
   /**
    * Skip static assets and image optimisation. API routes are included so they
    * pick up the security headers and the CSRF cookie, but the handlers do their
-   * own auth — middleware never gates them.
+   * own auth - middleware never gates them.
    */
   matcher: [
     '/((?!_next/static|_next/image|uploads|brand|favicon\\.ico|favicon\\.svg|manifest\\.json|og\\.png|icon-.*\\.png|apple-touch-icon\\.png|sw\\.js|robots\\.txt|sitemap\\.xml).*)',

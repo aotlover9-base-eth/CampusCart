@@ -4,7 +4,7 @@ import 'dotenv/config'
 
 /**
  * Seeds the category tree, feature flags, and default site settings.
- * Idempotent — safe to run repeatedly.
+ * Idempotent - safe to run repeatedly.
  */
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL ?? '' })

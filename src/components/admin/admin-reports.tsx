@@ -16,7 +16,7 @@ import { AdminList, AdminRow, FilterTabs } from './admin-list'
  * Moderation queue.
  *
  * Reading a reported conversation opens a panel that states plainly that the
- * access is recorded — the log entry is written server-side before any message
+ * access is recorded - the log entry is written server-side before any message
  * is returned, and the moderator should know that as they do it.
  */
 

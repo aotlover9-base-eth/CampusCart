@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { useTheme } from './theme-provider'
 
 /**
- * Theme toggle — a sliding knob with crossfading sun/moon glyphs.
+ * Theme toggle - a sliding knob with crossfading sun/moon glyphs.
  *
  * Announced as a switch to assistive tech, with the resolved theme in the label
  * so screen-reader users know the current state rather than just the action.

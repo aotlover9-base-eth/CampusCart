@@ -16,12 +16,12 @@ import { CheckIcon, ShieldIcon } from '@/components/ui/icons'
  * Add and verify an email address after signing up by phone.
  *
  * Signup only requires a phone number, so a user who joined that way had no way
- * to attach an email — and therefore no way to earn the VIT badge. This puts the
+ * to attach an email - and therefore no way to earn the VIT badge. This puts the
  * whole flow in Settings: send a code, enter it, badge granted if the domain
  * matches.
  *
  * The badge requires a *verified* address, so the email is never trusted from
- * the input alone — /api/auth/email PUT is what sets it.
+ * the input alone - /api/auth/email PUT is what sets it.
  */
 
 const RESEND_SECONDS = 60
@@ -94,7 +94,7 @@ export function EmailVerification({
 
       toast.success(
         result.isVitVerified
-          ? 'Email verified — VIT badge granted'
+          ? 'Email verified - VIT badge granted'
           : 'Email verified',
       )
       setStep('idle')

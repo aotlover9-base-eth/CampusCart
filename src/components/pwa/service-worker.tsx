@@ -17,7 +17,7 @@ export function ServiceWorkerRegistration() {
     // Registering after load keeps the worker off the critical path.
     const register = () => {
       void navigator.serviceWorker.register('/sw.js').catch(() => {
-        // A failed registration only costs offline support — never block the app.
+        // A failed registration only costs offline support - never block the app.
       })
     }
 

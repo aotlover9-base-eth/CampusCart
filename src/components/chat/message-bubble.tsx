@@ -11,7 +11,7 @@ import type { ChatMessage } from './types'
 /**
  * One message.
  *
- * SYSTEM messages render as a centred pill rather than a bubble — they are
+ * SYSTEM messages render as a centred pill rather than a bubble - they are
  * events (offer accepted, number shared), not something anyone said.
  */
 export function MessageBubble({
@@ -27,7 +27,7 @@ export function MessageBubble({
 }) {
   const [lightboxOpen, setLightboxOpen] = useState(false)
 
-  // Offers get an actionable card rather than a bubble — the seller decides
+  // Offers get an actionable card rather than a bubble - the seller decides
   // here instead of being sent off to another screen.
   if (message.kind === 'OFFER') {
     return <OfferCard message={message} onResolved={onOfferResolved} />

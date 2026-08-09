@@ -27,8 +27,8 @@ interface Props {
  * Thread view.
  *
  * The first page of messages is server-rendered so the conversation is readable
- * on arrival rather than after a client fetch. Everything past that — older
- * history, new messages, typing, receipts — is handled client-side.
+ * on arrival rather than after a client fetch. Everything past that - older
+ * history, new messages, typing, receipts - is handled client-side.
  */
 export default async function ChatPage({ params }: Props) {
   const { conversationId } = await params

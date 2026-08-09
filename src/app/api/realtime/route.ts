@@ -3,7 +3,7 @@ import { subscribeAll, type RealtimeEvent } from '@/lib/realtime'
 import { db } from '@/lib/db'
 
 /**
- * GET /api/realtime — server-sent events for messages, typing, and notifications.
+ * GET /api/realtime - server-sent events for messages, typing, and notifications.
  *
  * SSE rather than WebSockets: the payload is one-directional (the client posts
  * through normal routes), it survives proxies that mangle upgrades, and browsers

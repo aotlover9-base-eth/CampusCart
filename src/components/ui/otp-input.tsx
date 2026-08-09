@@ -77,7 +77,7 @@ export function OtpInput({
       if (value[index]) {
         setDigit(index, '')
       } else if (index > 0) {
-        // Empty box — step back and clear the previous one.
+        // Empty box - step back and clear the previous one.
         const next = value.split('')
         next[index - 1] = ''
         onChange(next.join(''))

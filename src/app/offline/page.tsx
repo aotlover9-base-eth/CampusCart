@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 /**
  * Served by the service worker when a navigation fails with no network.
  *
- * Must be fully static — it has to render from cache with nothing available.
+ * Must be fully static - it has to render from cache with nothing available.
  */
 export default function OfflinePage() {
   return <OfflineNotice />

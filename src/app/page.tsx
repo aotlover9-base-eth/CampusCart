@@ -10,9 +10,9 @@ import { CategoryIcon } from '@/components/brand/icons'
 import { listCategories } from '@/lib/categories'
 
 export const metadata: Metadata = {
-  title: 'CampusCart — The VIT Bhopal Student Marketplace',
+  title: 'CampusCart - The VIT Bhopal Student Marketplace',
   description:
-    'Buy and sell across VIT Bhopal. Electronics, books, cycles, furniture, services — everything students need.',
+    'Buy and sell across VIT Bhopal. Electronics, books, cycles, furniture, services - everything students need.',
 }
 
 export const revalidate = 300
@@ -20,7 +20,7 @@ export const revalidate = 300
 /**
  * Public landing page.
  *
- * Signed-in users never see this — middleware redirects them, and this
+ * Signed-in users never see this - middleware redirects them, and this
  * re-checks so a stale cookie cannot land someone on the marketing page.
  */
 export default async function LandingPage() {
@@ -62,7 +62,7 @@ export default async function LandingPage() {
             </h1>
 
             <p className="mt-5 max-w-[46ch] text-[16px] leading-relaxed text-[var(--color-ink-muted)] sm:text-[17px]">
-              Textbooks, cycles, hostel gear, calculators, tickets — buy and sell
+              Textbooks, cycles, hostel gear, calculators, tickets - buy and sell
               with people two blocks away. No shipping, no strangers, no fees.
             </p>
 

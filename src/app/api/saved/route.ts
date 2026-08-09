@@ -10,7 +10,7 @@ import {
 } from '@/lib/listings'
 
 /**
- * GET /api/saved — the viewer's saved listings, most recently saved first.
+ * GET /api/saved - the viewer's saved listings, most recently saved first.
  *
  * Paginates over SavedListing rather than Listing, because the meaningful order
  * here is when the user saved something, not when it was posted. The response

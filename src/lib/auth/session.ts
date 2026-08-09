@@ -8,7 +8,7 @@ import { signAccessToken, ttlToMs } from '../jwt'
  *
  * Access tokens are short-lived JWTs. Refresh tokens are opaque random strings
  * stored hashed in the database, so they're revocable. Every use of a refresh
- * token rotates it — the old one is marked `replacedById` and a new one is
+ * token rotates it - the old one is marked `replacedById` and a new one is
  * issued. A stolen refresh token used after rotation is detectable as a replay
  * attack, and the entire session family is revoked.
  */
@@ -81,7 +81,7 @@ export async function rotateSession(
 
   if (!session || session.revokedAt || session.expiresAt < new Date()) {
     // The token was already used and rotated, or it's expired. Check if it was
-    // replaced by another token — if so, that's a replay attack. Revoke the
+    // replaced by another token - if so, that's a replay attack. Revoke the
     // entire chain to stop the attacker.
     if (session?.replacedById) {
       await revokeSessionFamily(session.id)
@@ -125,7 +125,7 @@ export async function rotateSession(
 }
 
 /**
- * Revoke a single session — used for logout. Returns true if a live session was
+ * Revoke a single session - used for logout. Returns true if a live session was
  * actually revoked.
  */
 export async function revokeSession(refreshToken: string): Promise<boolean> {
@@ -145,7 +145,7 @@ export async function revokeSession(refreshToken: string): Promise<boolean> {
   return true
 }
 
-/** Revoke all sessions for a user — password change, account compromise. */
+/** Revoke all sessions for a user - password change, account compromise. */
 export async function revokeAllUserSessions(userId: string): Promise<number> {
   const { count } = await db.session.updateMany({
     where: { userId, revokedAt: null },

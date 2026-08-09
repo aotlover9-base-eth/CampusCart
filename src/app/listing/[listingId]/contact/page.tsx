@@ -18,8 +18,8 @@ interface Props {
 /**
  * Phone-request screen.
  *
- * Resolves the current state of the request server-side — none, pending,
- * accepted, or rejected — so the buyer lands on the right step. The number
+ * Resolves the current state of the request server-side - none, pending,
+ * accepted, or rejected - so the buyer lands on the right step. The number
  * itself is fetched separately by the client from the one route that gates it,
  * rather than being embedded here.
  */

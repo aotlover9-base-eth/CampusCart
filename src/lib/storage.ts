@@ -81,7 +81,7 @@ class LocalDriver implements StorageDriver {
  *
  * Deliberately unimplemented: the local driver is the chosen default, and a
  * half-working S3 path is worse than an explicit one. To enable, install
- * `@aws-sdk/client-s3` and fill in the three methods — the interface and env
+ * `@aws-sdk/client-s3` and fill in the three methods - the interface and env
  * vars are already in place, so nothing else has to change.
  */
 class S3Driver implements StorageDriver {
@@ -167,7 +167,7 @@ export function absoluteUrl(pathOrUrl: string): string {
 /**
  * Upload pipeline for images.
  *
- * 1. Detects the real type from magic bytes — the client's MIME claim is not
+ * 1. Detects the real type from magic bytes - the client's MIME claim is not
  *    trusted and is never used to decide anything
  * 2. Re-encodes with sharp, which strips EXIF (including GPS coordinates) and
  *    neutralises anything hiding in the original container
@@ -239,7 +239,7 @@ export async function processImage(buffer: Buffer): Promise<ProcessedImage> {
 /**
  * Upload pipeline for videos.
  *
- * Videos are stored as uploaded — transcoding and poster-frame extraction need
+ * Videos are stored as uploaded - transcoding and poster-frame extraction need
  * ffmpeg, which is not available on every runtime. The type is still verified
  * from magic bytes, so a disguised file cannot get through.
  */

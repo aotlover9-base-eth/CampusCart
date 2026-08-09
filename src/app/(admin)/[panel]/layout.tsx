@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
  *
  * Mounted on a dynamic segment because the panel's path is env-configured and
  * unguessable by design. Static routes take priority in the App Router, so this
- * only ever catches single-segment paths that would otherwise 404 — and any
+ * only ever catches single-segment paths that would otherwise 404 - and any
  * segment that isn't the configured one 404s here, identically.
  *
  * Middleware separately gates the session and sets noindex/no-store, so this

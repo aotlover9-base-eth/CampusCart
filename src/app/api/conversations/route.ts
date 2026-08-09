@@ -11,8 +11,8 @@ import {
 } from '@/lib/conversations'
 
 /**
- * GET  /api/conversations — the viewer's threads, newest activity first.
- * POST /api/conversations — open (or reopen) the thread for a listing.
+ * GET  /api/conversations - the viewer's threads, newest activity first.
+ * POST /api/conversations - open (or reopen) the thread for a listing.
  */
 
 const PAGE_SIZE = 25
@@ -99,7 +99,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       return fail('You cannot message this seller', 403)
     }
 
-    // One thread per (listing, buyer, seller) triple — reuse it if it exists.
+    // One thread per (listing, buyer, seller) triple - reuse it if it exists.
     const existing = await db.conversation.findFirst({
       where: { listingId: listing.id, buyerId: user.id, sellerId: listing.sellerId },
       select: conversationListSelect,

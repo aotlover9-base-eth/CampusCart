@@ -21,7 +21,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const body = await parseBody(request, verifyOtpSchema)
     const meta = await requestMeta()
 
-    const destination = body.channel === 'SMS' ? body.phone! : body.email!
+    const destination = body.email!
 
     const result = await verifyOtp({
       purpose: body.purpose,
@@ -35,30 +35,24 @@ export async function POST(request: Request): Promise<NextResponse> {
         : fail(result.error ?? 'Verification failed', 400, { code: result.error ?? '' })
     }
 
-    // EMAIL_VERIFY runs while already signed in — it attaches the address and
+    // EMAIL_VERIFY runs while already signed in - it attaches the address and
     // may grant the VIT badge. Handled by its own route.
     if (body.purpose === 'EMAIL_VERIFY') {
       return ok({ verified: true, next: 'email_attached' as const })
     }
 
     const user = await db.user.findFirst({
-      where: body.channel === 'SMS' ? { phone: destination } : { email: destination },
+      where: { email: destination, deletedAt: null },
       select: { id: true, status: true, deletedAt: true, fullName: true, role: true },
     })
 
-    // No account: the caller has proven control of the number but still needs a
-    // profile. Signup is completed by the next request.
+    // No account yet: the caller has proven control of the email address.
+    // Redirect to onboarding profile completion.
     if (!user || user.deletedAt) {
-      if (body.channel !== 'SMS') {
-        return fail(
-          'No account uses this email. Sign up with your phone number first.',
-          404,
-        )
-      }
       return ok({
         verified: true,
         next: 'needs_profile' as const,
-        phone: destination,
+        email: destination,
       })
     }
 
@@ -66,12 +60,10 @@ export async function POST(request: Request): Promise<NextResponse> {
       return fail('This account is not active. Contact support.', 403)
     }
 
-    // Verifying by SMS also confirms the number, which matters for accounts
-    // created before a phone-verification backfill.
     await db.user.update({
       where: { id: user.id },
       data: {
-        ...(body.channel === 'SMS' ? { phoneVerifiedAt: new Date() } : {}),
+        emailVerifiedAt: new Date(),
         lastSeenAt: new Date(),
         isOnline: true,
       },

@@ -6,7 +6,7 @@ import { cursorPaginationSchema } from '@/lib/validation'
 import { db } from '@/lib/db'
 
 /**
- * GET /api/admin/logs — the audit trail.
+ * GET /api/admin/logs - the audit trail.
  *
  * SUPER_ADMIN only. The trail exists to hold admins accountable, so a moderator
  * cannot read (or, since the table is append-only, edit) the record of their own
@@ -46,7 +46,7 @@ export async function GET(request: Request): Promise<NextResponse> {
         take: limit + 1,
         ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
       }),
-      // Only on the first page — this is context, not a second paginated list.
+      // Only on the first page - this is context, not a second paginated list.
       cursor
         ? Promise.resolve([])
         : db.chatAccessLog.findMany({
