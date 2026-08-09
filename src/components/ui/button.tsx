@@ -58,7 +58,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       {...(props as React.ComponentProps<typeof motion.button>)}
     >
       {loading && <Spinner />}
-      <span className={cn(loading && 'opacity-0')}>{children}</span>
+      <span className={cn('inline-flex items-center justify-center gap-1.5', loading && 'opacity-0')}>{children}</span>
     </motion.button>
   )
 })
