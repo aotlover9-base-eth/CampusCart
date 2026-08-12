@@ -35,7 +35,7 @@ const adminPath = (): string => {
   return `/${raw.replace(/^\/+|\/+$/g, '')}`
 }
 
-export function proxy(request: NextRequest): NextResponse {
+export default function proxy(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl
   const isAdminArea = pathname === adminPath() || pathname.startsWith(`${adminPath()}/`)
 
