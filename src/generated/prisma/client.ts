@@ -92,6 +92,11 @@ export type Listing = Prisma.ListingModel
  */
 export type ListingMedia = Prisma.ListingMediaModel
 /**
+ * Model MediaData
+ * 
+ */
+export type MediaData = Prisma.MediaDataModel
+/**
  * Model ListingLike
  * 
  */

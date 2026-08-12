@@ -407,6 +407,7 @@ export const ModelName = {
   Category: 'Category',
   Listing: 'Listing',
   ListingMedia: 'ListingMedia',
+  MediaData: 'MediaData',
   ListingLike: 'ListingLike',
   SavedListing: 'SavedListing',
   ListingView: 'ListingView',
@@ -447,7 +448,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "userSettings" | "hostelLocation" | "geoLocation" | "session" | "otpCode" | "rateLimitHit" | "category" | "listing" | "listingMedia" | "listingLike" | "savedListing" | "listingView" | "conversation" | "conversationMember" | "message" | "userBlock" | "offer" | "phoneRequest" | "notification" | "report" | "adminUser" | "adminSession" | "auditLog" | "chatAccessLog" | "siteSetting" | "featureFlag" | "announcement" | "dailyStat" | "subscription" | "rating" | "wallet" | "walletTransaction" | "coupon" | "referral"
+    modelProps: "user" | "userSettings" | "hostelLocation" | "geoLocation" | "session" | "otpCode" | "rateLimitHit" | "category" | "listing" | "listingMedia" | "mediaData" | "listingLike" | "savedListing" | "listingView" | "conversation" | "conversationMember" | "message" | "userBlock" | "offer" | "phoneRequest" | "notification" | "report" | "adminUser" | "adminSession" | "auditLog" | "chatAccessLog" | "siteSetting" | "featureFlag" | "announcement" | "dailyStat" | "subscription" | "rating" | "wallet" | "walletTransaction" | "coupon" | "referral"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1188,6 +1189,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ListingMediaCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ListingMediaCountAggregateOutputType> | number
+        }
+      }
+    }
+    MediaData: {
+      payload: Prisma.$MediaDataPayload<ExtArgs>
+      fields: Prisma.MediaDataFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MediaDataFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaDataPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MediaDataFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaDataPayload>
+        }
+        findFirst: {
+          args: Prisma.MediaDataFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaDataPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MediaDataFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaDataPayload>
+        }
+        findMany: {
+          args: Prisma.MediaDataFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaDataPayload>[]
+        }
+        create: {
+          args: Prisma.MediaDataCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaDataPayload>
+        }
+        createMany: {
+          args: Prisma.MediaDataCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MediaDataCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaDataPayload>[]
+        }
+        delete: {
+          args: Prisma.MediaDataDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaDataPayload>
+        }
+        update: {
+          args: Prisma.MediaDataUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaDataPayload>
+        }
+        deleteMany: {
+          args: Prisma.MediaDataDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MediaDataUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MediaDataUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaDataPayload>[]
+        }
+        upsert: {
+          args: Prisma.MediaDataUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MediaDataPayload>
+        }
+        aggregate: {
+          args: Prisma.MediaDataAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMediaData>
+        }
+        groupBy: {
+          args: Prisma.MediaDataGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MediaDataGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MediaDataCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MediaDataCountAggregateOutputType> | number
         }
       }
     }
@@ -3280,6 +3355,16 @@ export const ListingMediaScalarFieldEnum = {
 export type ListingMediaScalarFieldEnum = (typeof ListingMediaScalarFieldEnum)[keyof typeof ListingMediaScalarFieldEnum]
 
 
+export const MediaDataScalarFieldEnum = {
+  key: 'key',
+  mimeType: 'mimeType',
+  data: 'data',
+  createdAt: 'createdAt'
+} as const
+
+export type MediaDataScalarFieldEnum = (typeof MediaDataScalarFieldEnum)[keyof typeof MediaDataScalarFieldEnum]
+
+
 export const ListingLikeScalarFieldEnum = {
   id: 'id',
   listingId: 'listingId',
@@ -3926,6 +4011,20 @@ export type ListEnumMediaKindFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
 
 
 /**
+ * Reference to a field of type 'Bytes'
+ */
+export type BytesFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Bytes'>
+    
+
+
+/**
+ * Reference to a field of type 'Bytes[]'
+ */
+export type ListBytesFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Bytes[]'>
+    
+
+
+/**
  * Reference to a field of type 'MessageKind'
  */
 export type EnumMessageKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageKind'>
@@ -4225,6 +4324,7 @@ export type GlobalOmitConfig = {
   category?: Prisma.CategoryOmit
   listing?: Prisma.ListingOmit
   listingMedia?: Prisma.ListingMediaOmit
+  mediaData?: Prisma.MediaDataOmit
   listingLike?: Prisma.ListingLikeOmit
   savedListing?: Prisma.SavedListingOmit
   listingView?: Prisma.ListingViewOmit

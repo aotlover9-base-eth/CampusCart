@@ -482,6 +482,15 @@ model ListingMedia {
   @@map("listing_media")
 }
 
+model MediaData {
+  key       String   @id
+  mimeType  String
+  data      Bytes
+  createdAt DateTime @default(now())
+
+  @@map("media_data")
+}
+
 model ListingLike {
   id        String  @id @default(cuid())
   listingId String

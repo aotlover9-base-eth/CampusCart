@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { NextResponse } from 'next/server'
+import { db } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,7 +30,7 @@ export async function GET(
   const ext = key.split('.').pop()?.toLowerCase() ?? 'webp'
   const contentType = MIME_MAP[ext] ?? 'application/octet-stream'
 
-  // Look in /tmp/uploads first, then fallback to public/uploads
+  // 1. Try reading from disk (/tmp/uploads or public/uploads)
   const pathsToTry = [
     path.join('/tmp', 'uploads', key),
     path.join(process.cwd(), 'public', 'uploads', key),
@@ -47,6 +48,24 @@ export async function GET(
     } catch {
       // Continue to next path
     }
+  }
+
+  // 2. Persistent Fallback: fetch from Neon DB media_data table
+  try {
+    const record = await db.mediaData.findUnique({
+      where: { key },
+    })
+
+    if (record) {
+      return new NextResponse(record.data, {
+        headers: {
+          'Content-Type': record.mimeType || contentType,
+          'Cache-Control': 'public, max-age=31536000, immutable',
+        },
+      })
+    }
+  } catch (err) {
+    console.error('Error fetching media from DB:', err)
   }
 
   return new NextResponse('File not found', { status: 404 })

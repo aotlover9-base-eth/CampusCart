@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto'
 import sharp from 'sharp'
 import { env, publicEnv } from './env'
 import { validateUpload } from './file-type'
+import { db } from './db'
 
 /**
  * Storage driver abstraction.
@@ -55,27 +56,36 @@ class LocalDriver implements StorageDriver {
     const key = await contentKey(buffer, mimeType)
     const filePath = this.resolveKey(key)
 
+    // Persist to Neon DB asynchronously so media is always recoverable across serverless recycles
+    void db.mediaData
+      .upsert({
+        where: { key },
+        create: { key, mimeType, data: new Uint8Array(buffer) },
+        update: {},
+      })
+      .catch(() => null)
+
     try {
       await fs.access(filePath)
-      return { key, url: `${this.baseUrl}/${key}` }
     } catch {
       try {
         await fs.mkdir(this.dir, { recursive: true })
         await fs.writeFile(filePath, buffer)
-        return { key, url: `${this.baseUrl}/${key}` }
       } catch {
-        // Fallback to /tmp on read-only serverless filesystems (EROFS)
-        await fs.mkdir(this.tmpDir, { recursive: true })
+        await fs.mkdir(this.tmpDir, { recursive: true }).catch(() => null)
         const tmpPath = path.join(this.tmpDir, key)
-        await fs.writeFile(tmpPath, buffer)
-        return { key, url: `/api/uploads/${key}` }
+        await fs.writeFile(tmpPath, buffer).catch(() => null)
       }
     }
+
+    const url = `${this.baseUrl}/${key}`
+    return { key, url }
   }
 
   async delete(key: string): Promise<void> {
     await fs.unlink(this.resolveKey(key)).catch(() => null)
     await fs.unlink(path.join(this.tmpDir, key)).catch(() => null)
+    await db.mediaData.delete({ where: { key } }).catch(() => null)
   }
 
   url(key: string): string {
@@ -204,25 +214,17 @@ export async function processImage(buffer: Buffer): Promise<ProcessedImage> {
     sharp(normalized).resize(16, 16, { fit: 'inside' }).webp({ quality: 50 }).toBuffer(),
   ])
 
-  const mainDataUrl = `data:image/webp;base64,${normalized.toString('base64')}`
-  const thumbDataUrl = `data:image/webp;base64,${thumbnail.toString('base64')}`
-
   const store = storage()
   const [main, thumb] = await Promise.all([
-    store.write(normalized, 'image/webp').catch(() => ({ key: mainDataUrl, url: mainDataUrl })),
-    store.write(thumbnail, 'image/webp').catch(() => ({ key: thumbDataUrl, url: thumbDataUrl })),
+    store.write(normalized, 'image/webp'),
+    store.write(thumbnail, 'image/webp'),
   ])
 
-  const isServerlessOrLocal = Boolean(process.env.VERCEL) || env().STORAGE_DRIVER === 'local' || main.url.startsWith('/api/uploads')
-
-  const finalMainUrl = isServerlessOrLocal ? mainDataUrl : main.url
-  const finalThumbUrl = isServerlessOrLocal ? thumbDataUrl : thumb.url
-
   return {
-    key: finalMainUrl,
-    url: finalMainUrl,
-    thumbnailKey: finalThumbUrl,
-    thumbnailUrl: finalThumbUrl,
+    key: main.key,
+    url: main.url,
+    thumbnailKey: thumb.key,
+    thumbnailUrl: thumb.url,
     blurDataUrl: `data:image/webp;base64,${blurBuffer.toString('base64')}`,
     width: metadata.width,
     height: metadata.height,

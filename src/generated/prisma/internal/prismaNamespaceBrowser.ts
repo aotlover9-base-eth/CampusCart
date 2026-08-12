@@ -61,6 +61,7 @@ export const ModelName = {
   Category: 'Category',
   Listing: 'Listing',
   ListingMedia: 'ListingMedia',
+  MediaData: 'MediaData',
   ListingLike: 'ListingLike',
   SavedListing: 'SavedListing',
   ListingView: 'ListingView',
@@ -302,6 +303,16 @@ export const ListingMediaScalarFieldEnum = {
 } as const
 
 export type ListingMediaScalarFieldEnum = (typeof ListingMediaScalarFieldEnum)[keyof typeof ListingMediaScalarFieldEnum]
+
+
+export const MediaDataScalarFieldEnum = {
+  key: 'key',
+  mimeType: 'mimeType',
+  data: 'data',
+  createdAt: 'createdAt'
+} as const
+
+export type MediaDataScalarFieldEnum = (typeof MediaDataScalarFieldEnum)[keyof typeof MediaDataScalarFieldEnum]
 
 
 export const ListingLikeScalarFieldEnum = {
