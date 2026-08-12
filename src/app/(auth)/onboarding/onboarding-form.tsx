@@ -27,15 +27,19 @@ interface CompleteProfileResult {
 
 export function OnboardingForm({
   email,
+  initialFullName = '',
+  initialPassword = '',
   nextPath,
 }: {
   email: string
+  initialFullName?: string
+  initialPassword?: string
   nextPath: string | null
 }) {
   const [step, setStep] = useState<Step>('identity')
 
-  const [fullName, setFullName] = useState('')
-  const [password, setPassword] = useState('')
+  const [fullName, setFullName] = useState(initialFullName)
+  const [password, setPassword] = useState(initialPassword)
   const [department, setDepartment] = useState('')
   const [year, setYear] = useState('')
   const [bio, setBio] = useState('')

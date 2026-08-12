@@ -12,16 +12,21 @@ export const metadata: Metadata = {
 export default async function OnboardingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ email?: string; next?: string }>
+  searchParams: Promise<{ email?: string; fullName?: string; password?: string; next?: string }>
 }) {
   const user = await getSessionUser()
   if (user) redirect('/home')
 
-  const { email, next } = await searchParams
+  const { email, fullName, password, next } = await searchParams
 
-  // The email address arrives from the OTP verify step. Without it there is no proof
-  // of ownership to finish signup against, so send the user back to start.
   if (!email) redirect('/login')
 
-  return <OnboardingForm email={email} nextPath={next ?? null} />
+  return (
+    <OnboardingForm
+      email={email}
+      initialFullName={fullName ?? ''}
+      initialPassword={password ?? ''}
+      nextPath={next ?? null}
+    />
+  )
 }

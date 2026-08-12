@@ -26,10 +26,7 @@ interface VerifyResult {
   email?: string
 }
 
-interface CompleteProfileResult {
-  created: boolean
-  user: { id: string; fullName: string; role: string }
-}
+
 
 interface LoginResult {
   signedIn: boolean
@@ -163,16 +160,14 @@ export function LoginForm() {
         })
 
         if (verifyRes.next === 'needs_profile') {
-          // Add user to database immediately after OTP verification
-          await api<CompleteProfileResult>('/api/auth/complete-profile', {
-            method: 'POST',
-            body: {
-              email: signupEmail.trim(),
-              password: createPassword,
-              fullName: fullName.trim(),
-              role: 'OTHER',
-            },
+          const params = new URLSearchParams({
+            email: signupEmail.trim(),
+            fullName: fullName.trim(),
+            password: createPassword,
           })
+          if (nextPath) params.set('next', nextPath)
+          window.location.href = `/onboarding?${params.toString()}`
+          return
         }
 
         window.location.href = nextPath ?? '/home'
