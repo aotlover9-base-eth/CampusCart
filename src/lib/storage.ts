@@ -56,14 +56,16 @@ class LocalDriver implements StorageDriver {
     const key = await contentKey(buffer, mimeType)
     const filePath = this.resolveKey(key)
 
-    // Persist to Neon DB asynchronously so media is always recoverable across serverless recycles
-    void db.mediaData
-      .upsert({
+    // Persist to Neon DB so media is always recoverable across serverless recycles
+    try {
+      await db.mediaData.upsert({
         where: { key },
         create: { key, mimeType, data: new Uint8Array(buffer) },
         update: {},
       })
-      .catch(() => null)
+    } catch (err) {
+      console.error('Error saving media to DB:', err)
+    }
 
     try {
       await fs.access(filePath)
