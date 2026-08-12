@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { api } from '@/lib/client/fetcher'
 import { cn } from '@/lib/utils'
@@ -45,7 +45,6 @@ export function AdminShell({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
-  const router = useRouter()
   const [signingOut, setSigningOut] = useState(false)
 
   async function signOut() {
@@ -53,7 +52,7 @@ export function AdminShell({
     try {
       await api('/api/admin/logout', { method: 'POST' })
     } finally {
-      router.replace(`${basePath}/login`)
+      window.location.href = `${basePath}/login`
     }
   }
 

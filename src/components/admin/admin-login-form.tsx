@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { api, ApiError } from '@/lib/client/fetcher'
 import { Button } from '@/components/ui/button'
@@ -16,7 +16,6 @@ import { LockIcon } from '@/components/ui/icons'
  * current URL so nothing here has to know the configured value.
  */
 export function AdminLoginForm() {
-  const router = useRouter()
   const pathname = usePathname()
   const base = pathname.replace(/\/login\/?$/, '')
 
@@ -37,8 +36,8 @@ export function AdminLoginForm() {
         method: 'POST',
         body: { username: username.trim(), password },
       })
-      // Full navigation, so middleware re-runs and sees the new cookie.
-      router.replace(`${base}/dashboard`)
+      // Full browser navigation so cookies and RSC headers refresh cleanly
+      window.location.href = `${base}/dashboard`
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : 'Could not sign in.')
       setPassword('')
