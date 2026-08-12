@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { adminBasePath, currentAdmin } from '@/lib/admin/auth'
 import { AdminShell } from '@/components/admin/admin-shell'
+import { ToastProvider } from '@/components/ui/toast'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,11 +18,13 @@ export default async function AdminAreaLayout({ children }: { children: ReactNod
   if (!admin) redirect(`${adminBasePath()}/login`)
 
   return (
-    <AdminShell
-      admin={{ username: admin.username, role: admin.role }}
-      basePath={adminBasePath()}
-    >
-      {children}
-    </AdminShell>
+    <ToastProvider>
+      <AdminShell
+        admin={{ username: admin.username, role: admin.role }}
+        basePath={adminBasePath()}
+      >
+        {children}
+      </AdminShell>
+    </ToastProvider>
   )
 }
