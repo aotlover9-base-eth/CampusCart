@@ -62,7 +62,8 @@
     "tailwindcss": "^4.3.3",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.66.0"
+    "typescript-eslint": "^8.66.0",
+    "vercel": "^58.9.5"
   },
   "engines": {
     "node": ">=20"
