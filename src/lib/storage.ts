@@ -79,18 +79,14 @@ class LocalDriver implements StorageDriver {
   }
 
   url(key: string): string {
+    if (!key) return ''
+    if (key.startsWith('data:') || key.startsWith('http://') || key.startsWith('https://')) {
+      return key
+    }
     return `${this.baseUrl}/${key}`
   }
 }
 
-/**
- * S3 / R2 driver.
- *
- * Deliberately unimplemented: the local driver is the chosen default, and a
- * half-working S3 path is worse than an explicit one. To enable, install
- * `@aws-sdk/client-s3` and fill in the three methods - the interface and env
- * vars are already in place, so nothing else has to change.
- */
 class S3Driver implements StorageDriver {
   private getEndpoint(key?: string): string {
     const { S3_ENDPOINT, S3_BUCKET, S3_PUBLIC_BASE_URL } = env()
@@ -108,7 +104,6 @@ class S3Driver implements StorageDriver {
     const { S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_BUCKET } = env()
 
     if (!S3_ACCESS_KEY_ID || !S3_SECRET_ACCESS_KEY || !S3_BUCKET) {
-      // Fallback gracefully to local storage if S3 credentials are unset
       const local = new LocalDriver()
       return local.write(buffer, mimeType)
     }
@@ -144,6 +139,10 @@ class S3Driver implements StorageDriver {
   }
 
   url(key: string): string {
+    if (!key) return ''
+    if (key.startsWith('data:') || key.startsWith('http://') || key.startsWith('https://')) {
+      return key
+    }
     return this.getEndpoint(key)
   }
 }
@@ -158,29 +157,12 @@ export function storage(): StorageDriver {
   return driverInstance
 }
 
-/**
- * Absolute URL for a stored object.
- *
- * The local driver returns root-relative paths, which is what next/image and the
- * browser want. Open Graph tags and share links need a fully-qualified URL, so
- * they go through this instead.
- */
 export function absoluteUrl(pathOrUrl: string): string {
-  if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl
+  if (!pathOrUrl) return ''
+  if (/^data:|^https?:\/\//i.test(pathOrUrl)) return pathOrUrl
   const base = publicEnv.appUrl.replace(/\/$/, '')
   return `${base}${pathOrUrl.startsWith('/') ? '' : '/'}${pathOrUrl}`
 }
-
-/**
- * Upload pipeline for images.
- *
- * 1. Detects the real type from magic bytes - the client's MIME claim is not
- *    trusted and is never used to decide anything
- * 2. Re-encodes with sharp, which strips EXIF (including GPS coordinates) and
- *    neutralises anything hiding in the original container
- * 3. Generates a 400px thumbnail and a 16px blur placeholder
- * 4. Writes both to storage
- */
 
 interface ProcessedImage {
   key: string
@@ -207,13 +189,10 @@ export async function processImage(buffer: Buffer): Promise<ProcessedImage> {
     throw new Error('Could not read image dimensions')
   }
 
-  // Guard against decompression bombs: a small file can declare enormous
-  // dimensions and exhaust memory when sharp allocates the bitmap.
   if (metadata.width * metadata.height > 50_000_000) {
     throw new Error('Image resolution is too large')
   }
 
-  // .rotate() applies EXIF orientation, then the re-encode drops all metadata.
   const normalized = await sharp(buffer)
     .rotate()
     .resize(2400, 2400, { fit: 'inside', withoutEnlargement: true })
@@ -225,17 +204,25 @@ export async function processImage(buffer: Buffer): Promise<ProcessedImage> {
     sharp(normalized).resize(16, 16, { fit: 'inside' }).webp({ quality: 50 }).toBuffer(),
   ])
 
+  const mainDataUrl = `data:image/webp;base64,${normalized.toString('base64')}`
+  const thumbDataUrl = `data:image/webp;base64,${thumbnail.toString('base64')}`
+
   const store = storage()
   const [main, thumb] = await Promise.all([
-    store.write(normalized, 'image/webp'),
-    store.write(thumbnail, 'image/webp'),
+    store.write(normalized, 'image/webp').catch(() => ({ key: mainDataUrl, url: mainDataUrl })),
+    store.write(thumbnail, 'image/webp').catch(() => ({ key: thumbDataUrl, url: thumbDataUrl })),
   ])
 
+  const isServerlessOrLocal = Boolean(process.env.VERCEL) || env().STORAGE_DRIVER === 'local' || main.url.startsWith('/api/uploads')
+
+  const finalMainUrl = isServerlessOrLocal ? mainDataUrl : main.url
+  const finalThumbUrl = isServerlessOrLocal ? thumbDataUrl : thumb.url
+
   return {
-    key: main.key,
-    url: main.url,
-    thumbnailKey: thumb.key,
-    thumbnailUrl: thumb.url,
+    key: finalMainUrl,
+    url: finalMainUrl,
+    thumbnailKey: finalThumbUrl,
+    thumbnailUrl: finalThumbUrl,
     blurDataUrl: `data:image/webp;base64,${blurBuffer.toString('base64')}`,
     width: metadata.width,
     height: metadata.height,
