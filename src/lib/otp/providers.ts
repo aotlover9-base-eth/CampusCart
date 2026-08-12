@@ -372,15 +372,44 @@ function otpEmailHtml(code: string, minutes: number): string {
 </div></body></html>`
 }
 
-/** SMTP is intentionally not bundled - nodemailer is added only if selected. */
 class SmtpProvider implements OtpProvider {
   readonly name = 'smtp'
 
-  async send(): Promise<SendResult> {
-    return {
-      ok: false,
-      error:
-        'SMTP provider selected but not installed. Run `npm i nodemailer` and implement SmtpProvider.send, or use OTP_EMAIL_PROVIDER="resend".',
+  async send({ destination, code, expiresInSeconds }: OtpMessage): Promise<SendResult> {
+    const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, EMAIL_FROM } = env()
+    if (!SMTP_HOST || !SMTP_USER || !SMTP_PASSWORD) {
+      return {
+        ok: false,
+        error: 'SMTP credentials (SMTP_HOST, SMTP_USER, SMTP_PASSWORD) are not configured in environment variables.',
+      }
+    }
+
+    const minutes = Math.round(expiresInSeconds / 60)
+
+    try {
+      const nodemailer = await import('nodemailer')
+      const port = SMTP_PORT || 465
+      const transporter = nodemailer.createTransport({
+        host: SMTP_HOST,
+        port,
+        secure: port === 465,
+        auth: {
+          user: SMTP_USER,
+          pass: SMTP_PASSWORD,
+        },
+      })
+
+      const info = await transporter.sendMail({
+        from: EMAIL_FROM.includes('@') ? EMAIL_FROM : `"CampusCart" <${SMTP_USER}>`,
+        to: destination,
+        subject: `${code} is your CampusCart code`,
+        text: otpText(code, minutes),
+        html: otpEmailHtml(code, minutes),
+      })
+
+      return { ok: true, providerMessageId: info.messageId }
+    } catch (error) {
+      return { ok: false, error: error instanceof Error ? error.message : 'SMTP email delivery failed' }
     }
   }
 }
