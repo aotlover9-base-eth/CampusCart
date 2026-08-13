@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { cookies, headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { db } from '../db'
@@ -70,11 +71,14 @@ export interface SessionUser {
   locationLabel: string | null
 }
 
+
 /**
  * Resolve the signed-in user from the access-token cookie.
  * Returns null when there's no valid token - never throws.
+ * Wrapped in React cache() so multiple components/services in a single server
+ * request share 1 DB query instead of re-fetching the user every time.
  */
-export async function currentUser(): Promise<AuthUser | null> {
+export const currentUser = cache(async (): Promise<AuthUser | null> => {
   const store = await cookies()
   const token = store.get(ACCESS_COOKIE)?.value
   if (!token) return null
@@ -104,7 +108,7 @@ export async function currentUser(): Promise<AuthUser | null> {
 
   const { deletedAt: _deletedAt, ...rest } = user
   return rest
-}
+})
 
 /** Like currentUser, but throws a 401-shaped error for protected handlers. */
 export async function requireUser(): Promise<AuthUser> {

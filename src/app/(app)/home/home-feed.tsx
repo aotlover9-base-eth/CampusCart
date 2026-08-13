@@ -17,7 +17,13 @@ import { SORT_OPTIONS, SortSelect } from '@/components/listing/sort-select'
  * surface, and /browse is the shareable, URL-driven one. Distance sort needs
  * coordinates, so it is only offered to users who have a saved location.
  */
-export function HomeFeed({ categories }: { categories: CategoryNode[] }) {
+export function HomeFeed({
+  categories,
+  initialData,
+}: {
+  categories: CategoryNode[]
+  initialData?: { listings: any[]; nextCursor: string | null; hasMore: boolean }
+}) {
   const user = useCurrentUser()
   const [categorySlug, setCategorySlug] = useState<string | null>(null)
   const [sort, setSort] = useState<string>('newest')
@@ -78,6 +84,7 @@ export function HomeFeed({ categories }: { categories: CategoryNode[] }) {
 
       <ListingFeed
         filters={filters}
+        initialData={categorySlug === null && sort === 'newest' ? initialData : undefined}
         emptyTitle={activeCategory ? `No ${activeCategory.name} listings` : 'Feed is empty'}
         emptyDescription={
           activeCategory

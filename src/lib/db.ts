@@ -24,4 +24,4 @@ function createClient(): PrismaClient {
 
 export const db: PrismaClient = globalForPrisma.prisma ?? createClient()
 
-if (isDevelopment) globalForPrisma.prisma = db
+globalForPrisma.prisma = db
