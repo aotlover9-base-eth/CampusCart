@@ -155,7 +155,6 @@ export function visibilityWhere(viewerId?: string): Prisma.ListingWhereInput {
       // Sellers additionally see their own drafts and pending items.
       ...(viewerId ? [{ sellerId: viewerId }] : []),
     ],
-    seller: { status: 'ACTIVE', deletedAt: null },
   }
 }
 

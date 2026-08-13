@@ -449,6 +449,7 @@ model Listing {
   reports       Report[]
 
   @@index([status, publishedAt(sort: Desc)])
+  @@index([deletedAt, status, publishedAt(sort: Desc)])
   @@index([categoryId, status])
   @@index([sellerId, status])
   @@index([priceInPaise])

@@ -150,11 +150,15 @@ export async function PATCH(request: Request): Promise<NextResponse> {
 
     await db.user.update({ where: { id: body.userId }, data })
 
-    // A banned or deleted account must not stay signed in anywhere.
+    // A banned, suspended, or deleted account must not stay signed in anywhere, and its listings are deactivated.
     if (['ban', 'delete', 'suspend'].includes(body.action)) {
       await db.session.updateMany({
         where: { userId: body.userId, revokedAt: null },
         data: { revokedAt: new Date() },
+      })
+      await db.listing.updateMany({
+        where: { sellerId: body.userId, deletedAt: null },
+        data: { deletedAt: new Date() },
       })
     }
 
