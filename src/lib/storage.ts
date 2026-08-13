@@ -99,72 +99,11 @@ class LocalDriver implements StorageDriver {
   }
 }
 
-class S3Driver implements StorageDriver {
-  private getEndpoint(key?: string): string {
-    const { S3_ENDPOINT, S3_BUCKET, S3_PUBLIC_BASE_URL } = env()
-    if (S3_PUBLIC_BASE_URL && key) {
-      return `${S3_PUBLIC_BASE_URL.replace(/\/$/, '')}/${key}`
-    }
-    const base = S3_ENDPOINT
-      ? S3_ENDPOINT.replace(/\/$/, '')
-      : `https://${S3_BUCKET ?? 'campuscart'}.s3.amazonaws.com`
-    return key ? `${base}/${key}` : base
-  }
-
-  async write(buffer: Buffer, mimeType: string): Promise<{ key: string; url: string }> {
-    const key = await contentKey(buffer, mimeType)
-    const { S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_BUCKET } = env()
-
-    if (!S3_ACCESS_KEY_ID || !S3_SECRET_ACCESS_KEY || !S3_BUCKET) {
-      const local = new LocalDriver()
-      return local.write(buffer, mimeType)
-    }
-
-    const endpoint = this.getEndpoint(key)
-    try {
-      const res = await fetch(endpoint, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': mimeType,
-          'x-amz-acl': 'public-read',
-        },
-        body: new Uint8Array(buffer),
-      })
-
-      if (!res.ok) {
-        const local = new LocalDriver()
-        return local.write(buffer, mimeType)
-      }
-    } catch {
-      const local = new LocalDriver()
-      return local.write(buffer, mimeType)
-    }
-
-    return { key, url: this.url(key) }
-  }
-
-  async delete(key: string): Promise<void> {
-    const { S3_ACCESS_KEY_ID } = env()
-    if (!S3_ACCESS_KEY_ID) return
-    const endpoint = this.getEndpoint(key)
-    await fetch(endpoint, { method: 'DELETE' }).catch(() => null)
-  }
-
-  url(key: string): string {
-    if (!key) return ''
-    if (key.startsWith('data:') || key.startsWith('http://') || key.startsWith('https://')) {
-      return key
-    }
-    return this.getEndpoint(key)
-  }
-}
-
-/** Singleton: the active driver is selected once on first access. */
 let driverInstance: StorageDriver | null = null
 
 export function storage(): StorageDriver {
   if (!driverInstance) {
-    driverInstance = env().STORAGE_DRIVER === 's3' ? new S3Driver() : new LocalDriver()
+    driverInstance = new LocalDriver()
   }
   return driverInstance
 }
