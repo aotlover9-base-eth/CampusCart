@@ -48,6 +48,7 @@ export const listingCardSelect = {
   },
   media: {
     orderBy: { sortOrder: 'asc' },
+    take: 1,
     select: {
       id: true,
       kind: true,

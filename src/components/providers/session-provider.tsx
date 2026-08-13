@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { api } from '@/lib/client/fetcher'
 import type { SessionUser } from '@/lib/auth/context'
@@ -21,6 +21,7 @@ interface SessionContextValue {
 }
 
 const SessionContext = createContext<SessionContextValue | null>(null)
+
 
 export function SessionProvider({
   initialUser,
@@ -43,6 +44,24 @@ export function SessionProvider({
   const patch = useCallback((changes: Partial<SessionUser>) => {
     setUser((current) => (current ? { ...current, ...changes } : current))
   }, [])
+
+  // Fetch unread badge counts asynchronously in the background so layout SSR isn't blocked.
+  useEffect(() => {
+    if (!user?.id) return
+    let active = true
+
+    api<{ unreadNotifications: number; unreadChats: number; pendingRequests: number }>(
+      '/api/user/badges',
+    )
+      .then((badges) => {
+        if (active) patch(badges)
+      })
+      .catch(() => null)
+
+    return () => {
+      active = false
+    }
+  }, [user?.id, patch])
 
   const value = useMemo<SessionContextValue>(
     () => ({ user, isSignedIn: user !== null, refresh, patch }),
