@@ -75,6 +75,27 @@ export function ListingMedia({
     sessionMuted = next
   }
 
+  const [imgSrc, setImgSrc] = useState(item.url)
+  const [hasError, setHasError] = useState(false)
+
+  useEffect(() => {
+    setImgSrc(item.url)
+    setHasError(false)
+  }, [item.url])
+
+  function handleError() {
+    if (item.blurDataUrl && imgSrc !== item.blurDataUrl) {
+      setImgSrc(item.blurDataUrl)
+      setLoaded(true)
+    } else {
+      setHasError(true)
+    }
+  }
+
+  if (hasError && !item.blurDataUrl) {
+    return <MediaFallback className="h-full w-full" />
+  }
+
   return (
     <div
       ref={ref}
@@ -143,19 +164,19 @@ export function ListingMedia({
         </>
       ) : (
         <Image
-          src={item.url}
+          src={imgSrc}
           alt=""
           fill
           sizes={sizes}
           priority={priority}
-          // Below-the-fold images decode off the main thread so scrolling stays smooth.
           loading={priority ? undefined : 'lazy'}
           placeholder={item.blurDataUrl ? 'blur' : 'empty'}
           blurDataURL={item.blurDataUrl ?? undefined}
           onLoad={() => setLoaded(true)}
+          onError={handleError}
           className={cn(
             'object-cover transition-[opacity,transform] duration-500 ease-out',
-            loaded ? 'opacity-100' : 'opacity-0',
+            loaded || hasError ? 'opacity-100' : 'opacity-0',
           )}
         />
       )}

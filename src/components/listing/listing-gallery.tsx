@@ -93,23 +93,11 @@ export function ListingGallery({
               className="h-full w-full object-contain bg-black"
             />
           ) : active ? (
-            <button
-              type="button"
+            <GalleryImage
+              active={active}
+              title={title}
               onClick={() => setLightboxOpen(true)}
-              className="group block h-full w-full cursor-zoom-in"
-              aria-label="Open image full screen"
-            >
-              <Image
-                src={active.url}
-                alt={active.altText ?? title}
-                fill
-                sizes="(max-width: 1024px) 100vw, 720px"
-                priority
-                placeholder={active.blurDataUrl ? 'blur' : 'empty'}
-                blurDataURL={active.blurDataUrl ?? undefined}
-                className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-              />
-            </button>
+            />
           ) : null}
 
           {count > 1 && (
@@ -218,6 +206,57 @@ export function ListingGallery({
         )}
       </AnimatePresence>
     </>
+  )
+}
+
+function GalleryImage({
+  active,
+  title,
+  onClick,
+}: {
+  active: GalleryItem
+  title: string
+  onClick: () => void
+}) {
+  const [imgSrc, setImgSrc] = useState(active.url)
+  const [hasError, setHasError] = useState(false)
+
+  useEffect(() => {
+    setImgSrc(active.url)
+    setHasError(false)
+  }, [active.url])
+
+  function handleError() {
+    if (active.blurDataUrl && imgSrc !== active.blurDataUrl) {
+      setImgSrc(active.blurDataUrl)
+    } else {
+      setHasError(true)
+    }
+  }
+
+  if (hasError && !active.blurDataUrl) {
+    return <MediaFallback className="h-full w-full" />
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group block h-full w-full cursor-zoom-in"
+      aria-label="Open image full screen"
+    >
+      <Image
+        src={imgSrc}
+        alt={active.altText ?? title}
+        fill
+        sizes="(max-width: 1024px) 100vw, 720px"
+        priority
+        placeholder={active.blurDataUrl ? 'blur' : 'empty'}
+        blurDataURL={active.blurDataUrl ?? undefined}
+        onError={handleError}
+        className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+      />
+    </button>
   )
 }
 
