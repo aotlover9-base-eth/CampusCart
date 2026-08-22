@@ -328,9 +328,15 @@ export function MobileTabBar() {
 
   if (!isSignedIn) return null
 
-  // Search is dropped from the tab bar because it already has a permanent slot
-  // in the top bar; Offers does not, and it carries decisions someone is waiting
-  // on, so it takes the seat.
+  // Hide the global bottom tab bar on listing detail pages, individual chat rooms,
+  // and sell flow to prevent overlapping with page-specific action bars.
+  if (
+    pathname.startsWith('/listing/') ||
+    (pathname.startsWith('/chats/') && pathname !== '/chats') ||
+    pathname.startsWith('/sell/')
+  ) {
+    return null
+  }
   const tabs = [
     { href: '/home', label: 'Buy', icon: HomeIcon, match: ['/home', '/browse'] },
     {

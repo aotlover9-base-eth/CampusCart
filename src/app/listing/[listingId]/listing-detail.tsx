@@ -212,7 +212,7 @@ export function ListingDetail({
   }
 
   return (
-    <div className="mx-auto max-w-[var(--container-max)] px-4 py-5 sm:py-7">
+    <div className="mx-auto max-w-[var(--container-max)] px-4 py-5 pb-28 sm:py-7 lg:pb-7">
       <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-8">
         <div className="min-w-0">
           <ListingGallery media={listing.media} title={listing.title} />
