@@ -52,9 +52,9 @@ export function LogoLockup({
   markClassName?: string
 }) {
   return (
-    <span className={`inline-flex items-center gap-2 ${className ?? ''}`}>
-      <LogoMark className={markClassName ?? 'h-6 w-6'} />
-      <span className="text-[15px] font-semibold tracking-[-0.03em]">
+    <span className={`inline-flex items-center gap-2.5 ${className ?? ''}`}>
+      <LogoMark className={markClassName ?? 'h-7.5 w-7.5 sm:h-8 sm:w-8'} />
+      <span className="text-[19px] font-bold tracking-[-0.03em] sm:text-[21px]">
         Campus<span className="text-brand-gradient">Cart</span>
       </span>
     </span>
