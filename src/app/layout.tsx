@@ -3,7 +3,6 @@ import { Inter, Outfit } from 'next/font/google'
 import { ThemeProvider } from '@/components/theme/theme-provider'
 import { ThemeScript } from '@/components/theme/theme-script'
 import { ServiceWorkerRegistration } from '@/components/pwa/service-worker'
-import { SplashScreen } from '@/components/brand/splash-screen'
 import { publicEnv } from '@/lib/env'
 import '@/app/globals.css'
 
@@ -99,7 +98,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${fontSans.variable} ${fontDisplay.variable} font-sans`}>
         <ThemeProvider>
-          <SplashScreen />
           {children}
         </ThemeProvider>
         <ServiceWorkerRegistration />
