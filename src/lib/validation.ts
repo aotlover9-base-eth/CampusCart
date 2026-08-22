@@ -161,7 +161,10 @@ export const contactPreferenceSchema = z.enum([
  */
 const storageKeySchema = z
   .string()
-  .regex(/^[a-f0-9]{16}\.[a-z0-9]{2,5}$/i, 'Invalid media reference')
+  .min(1, 'Invalid media reference')
+  .max(500, 'Invalid media reference')
+  .refine((val) => !val.includes('..'), 'Invalid media reference')
+  .regex(/^[a-zA-Z0-9_\-./]+$/i, 'Invalid media reference')
 
 /** Media attached to a listing, as returned by /api/upload. */
 export const listingMediaSchema = z.object({
