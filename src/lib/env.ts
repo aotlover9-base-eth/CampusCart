@@ -63,12 +63,17 @@ const serverSchema = z.object({
 
   VIT_EMAIL_DOMAIN: z.string().default('vitbhopal.ac.in'),
 
-  STORAGE_DRIVER: z.enum(['local', 's3']).default('local'),
+  STORAGE_DRIVER: z.enum(['local', 's3', 'cloudinary']).default('local'),
   STORAGE_LOCAL_DIR: z.string().default('public/uploads'),
   MAX_IMAGE_MB: z.coerce.number().positive().default(8),
   MAX_VIDEO_MB: z.coerce.number().positive().default(60),
   MAX_IMAGES_PER_LISTING: z.coerce.number().int().positive().default(15),
   MAX_VIDEOS_PER_LISTING: z.coerce.number().int().positive().default(3),
+
+  CLOUDINARY_CLOUD_NAME: z.string().optional(),
+  CLOUDINARY_API_KEY: z.string().optional(),
+  CLOUDINARY_API_SECRET: z.string().optional(),
+  CLOUDINARY_URL: z.string().optional(),
 
   S3_ENDPOINT: z.string().optional(),
   S3_REGION: z.string().default('auto'),

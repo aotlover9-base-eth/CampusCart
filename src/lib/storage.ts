@@ -2,6 +2,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { createHash } from 'node:crypto'
 import sharp from 'sharp'
+import { v2 as cloudinary } from 'cloudinary'
 import { env, publicEnv } from './env'
 import { validateUpload } from './file-type'
 import { db } from './db'
@@ -99,11 +100,108 @@ class LocalDriver implements StorageDriver {
   }
 }
 
+class CloudinaryDriver implements StorageDriver {
+  private configured = false
+
+  constructor() {
+    try {
+      const e = env()
+      const url = e.CLOUDINARY_URL || process.env.CLOUDINARY_URL
+      const cloudName = e.CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME
+      const apiKey = e.CLOUDINARY_API_KEY || process.env.CLOUDINARY_API_KEY
+      const apiSecret = e.CLOUDINARY_API_SECRET || process.env.CLOUDINARY_API_SECRET
+
+      if (url) {
+        cloudinary.config({ cloudinary_url: url })
+        this.configured = true
+      } else if (cloudName && apiKey && apiSecret) {
+        cloudinary.config({
+          cloud_name: cloudName,
+          api_key: apiKey,
+          api_secret: apiSecret,
+          secure: true,
+        })
+        this.configured = true
+      }
+    } catch {
+      // Env reading fails during boot if optional vars are not set
+    }
+  }
+
+  async write(buffer: Buffer, mimeType: string): Promise<{ key: string; url: string }> {
+    if (!this.configured) {
+      return new LocalDriver().write(buffer, mimeType)
+    }
+
+    return new Promise((resolve, reject) => {
+      const isVideo = mimeType.startsWith('video/')
+      const resourceType = isVideo ? 'video' : 'image'
+
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'campuscart',
+          resource_type: resourceType,
+          format: isVideo ? undefined : 'webp',
+        },
+        (error, result) => {
+          if (error || !result) {
+            console.error('Cloudinary upload error, falling back to LocalDriver:', error)
+            return new LocalDriver().write(buffer, mimeType).then(resolve).catch(reject)
+          }
+          resolve({
+            key: result.public_id,
+            url: result.secure_url,
+          })
+        },
+      )
+
+      uploadStream.end(buffer)
+    })
+  }
+
+  async delete(key: string): Promise<void> {
+    if (!this.configured || !key) return
+    if (key.startsWith('http://') || key.startsWith('https://')) return
+    try {
+      await cloudinary.uploader.destroy(key)
+    } catch {
+      // Ignore delete errors
+    }
+  }
+
+  url(key: string): string {
+    if (!key) return ''
+    if (key.startsWith('data:') || key.startsWith('http://') || key.startsWith('https://')) {
+      return key
+    }
+    if (this.configured) {
+      return cloudinary.url(key, { secure: true })
+    }
+    return `/api/uploads/${key}`
+  }
+}
+
 let driverInstance: StorageDriver | null = null
 
 export function storage(): StorageDriver {
   if (!driverInstance) {
-    driverInstance = new LocalDriver()
+    let useCloudinary = false
+    try {
+      const e = env()
+      useCloudinary =
+        e.STORAGE_DRIVER === 'cloudinary' ||
+        Boolean(e.CLOUDINARY_CLOUD_NAME || e.CLOUDINARY_URL)
+    } catch {
+      useCloudinary = Boolean(
+        process.env.CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_URL,
+      )
+    }
+
+    if (useCloudinary) {
+      driverInstance = new CloudinaryDriver()
+    } else {
+      driverInstance = new LocalDriver()
+    }
   }
   return driverInstance
 }

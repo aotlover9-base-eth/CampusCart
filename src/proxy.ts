@@ -127,8 +127,8 @@ function applySecurityHeaders(
     "style-src 'self' 'unsafe-inline'",
     // OpenStreetMap tiles for the map picker; data:/blob: for blur placeholders
     // and client-side image compression previews.
-    "img-src 'self' data: blob: https://*.tile.openstreetmap.org",
-    "media-src 'self' blob:",
+    "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://res.cloudinary.com",
+    "media-src 'self' blob: https://res.cloudinary.com",
     "font-src 'self' data:",
     `connect-src 'self'${isDev ? ' ws: wss:' : ''}`,
     "form-action 'self'",
