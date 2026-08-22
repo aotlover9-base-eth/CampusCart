@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import type { CategoryNode } from '@/lib/categories'
@@ -114,22 +114,6 @@ export function ListingComposer({
   const allowsCustomLabel = Boolean(activeParent?.allowsCustomLabel)
 
   const priceNumber = Number(price)
-  const canSubmit = useMemo(() => {
-    if (title.trim().length < 4 || description.trim().length < 10) return false
-    if (!condition || !categoryId) return false
-    if (allowsCustomLabel && customLabel.trim().length < 2) return false
-    if (!isFree && (!Number.isFinite(priceNumber) || priceNumber <= 0)) return false
-    return true
-  }, [
-    title,
-    description,
-    condition,
-    categoryId,
-    allowsCustomLabel,
-    customLabel,
-    isFree,
-    priceNumber,
-  ])
 
   function selectParent(id: string) {
     setParentId(id)
@@ -139,12 +123,89 @@ export function ListingComposer({
     setCustomLabel('')
   }
 
+  function validateComposer(): { valid: boolean; missingList: string[]; fieldErrors: Record<string, string> } {
+    const fieldErrors: Record<string, string> = {}
+    const missingList: string[] = []
+
+    if (title.trim().length === 0) {
+      fieldErrors.title = 'Please enter a title for your item'
+      missingList.push('Title')
+    } else if (title.trim().length < 4) {
+      fieldErrors.title = 'Title must be at least 4 characters'
+      missingList.push('Title (at least 4 chars)')
+    }
+
+    if (description.trim().length === 0) {
+      fieldErrors.description = 'Please enter a description'
+      missingList.push('Description')
+    } else if (description.trim().length < 10) {
+      fieldErrors.description = 'Description must be at least 10 characters'
+      missingList.push('Description (at least 10 chars)')
+    }
+
+    if (!categoryId) {
+      fieldErrors.categoryId = 'Please select a category and subcategory'
+      missingList.push('Category')
+    }
+
+    if (allowsCustomLabel && customLabel.trim().length < 2) {
+      fieldErrors.customCategoryLabel = 'Please describe the custom category'
+      missingList.push('Category description')
+    }
+
+    if (!condition) {
+      fieldErrors.condition = 'Please select the item condition'
+      missingList.push('Condition')
+    }
+
+    if (!isFree) {
+      if (!price || price.trim() === '') {
+        fieldErrors.priceRupees = 'Please enter your asking price in ₹'
+        missingList.push('Asking price')
+      } else if (!Number.isFinite(priceNumber) || priceNumber <= 0) {
+        fieldErrors.priceRupees = 'Please enter a valid price (greater than 0)'
+        missingList.push('Valid price')
+      }
+    }
+
+    if (pickupArea === 'INSIDE_CAMPUS' && !hostelBlock) {
+      fieldErrors.hostelBlock = 'Please select your hostel block'
+      missingList.push('Hostel block')
+    } else if (pickupArea === 'OUTSIDE_CAMPUS' && !locationLabel.trim()) {
+      fieldErrors.locationLabel = 'Please enter your pickup area or landmark'
+      missingList.push('Pickup area/landmark')
+    }
+
+    return {
+      valid: missingList.length === 0,
+      missingList,
+      fieldErrors,
+    }
+  }
+
   async function submit(publish: boolean) {
     if (submitting) return
 
-    setSubmitting(true)
     setError(null)
     setFields({})
+
+    const validation = validateComposer()
+    if (!validation.valid) {
+      setFields(validation.fieldErrors)
+      const summaryMsg = `Please fill or select: ${validation.missingList.join(' · ')}`
+      setError(summaryMsg)
+      toast.error(`Please fill missing fields: ${validation.missingList[0]}`)
+
+      setTimeout(() => {
+        const banner = document.getElementById('composer-error-banner')
+        if (banner) {
+          banner.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 50)
+      return
+    }
+
+    setSubmitting(true)
 
     const payload = {
       title: title.trim(),
@@ -446,12 +507,14 @@ export function ListingComposer({
       </Section>
 
       {error && (
-        <p
+        <div
+          id="composer-error-banner"
           role="alert"
-          className="rounded-[10px] border border-[var(--color-danger)]/25 bg-[var(--color-danger-soft)] px-3 py-2.5 text-[13px] text-[var(--color-danger)]"
+          className="rounded-[12px] border border-[var(--color-danger)]/40 bg-[var(--color-danger-soft)] p-4 text-[13.5px] font-medium leading-relaxed text-[var(--color-danger)] shadow-sm"
         >
-          {error}
-        </p>
+          <p className="font-semibold">⚠️ Action Required:</p>
+          <p className="mt-1">{error}</p>
+        </div>
       )}
 
       {/* Sticky action bar so the primary action is always reachable. */}
@@ -461,7 +524,7 @@ export function ListingComposer({
             <Button
               type="button"
               variant="secondary"
-              disabled={submitting || !canSubmit}
+              disabled={submitting}
               onClick={() => void submit(false)}
             >
               Save draft
@@ -471,7 +534,6 @@ export function ListingComposer({
             type="submit"
             className="flex-1"
             loading={submitting}
-            disabled={!canSubmit}
           >
             {existing ? 'Save changes' : 'Publish listing'}
           </Button>

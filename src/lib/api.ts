@@ -59,7 +59,12 @@ export function handler(fn: () => Promise<NextResponse>): Promise<NextResponse> 
     }
 
     if (error instanceof z.ZodError) {
-      return fail('Please check the highlighted fields', 400, fieldErrors(error))
+      const errMap = fieldErrors(error)
+      const fieldNames = Object.values(errMap)
+      const summaryMsg = fieldNames.length > 0
+        ? `Please fill or select: ${fieldNames.join(' · ')}`
+        : 'Please check the highlighted fields'
+      return fail(summaryMsg, 400, errMap)
     }
 
     console.error('[api] unhandled error:', error)
