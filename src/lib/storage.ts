@@ -245,12 +245,12 @@ export async function processImage(buffer: Buffer): Promise<ProcessedImage> {
   const normalized = await sharp(buffer)
     .rotate()
     .resize(2400, 2400, { fit: 'inside', withoutEnlargement: true })
-    .webp({ quality: 85 })
+    .webp({ quality: 92 })
     .toBuffer()
 
   const [thumbnail, blurBuffer] = await Promise.all([
-    sharp(normalized).resize(400, 400, { fit: 'inside' }).webp({ quality: 80 }).toBuffer(),
-    sharp(normalized).resize(16, 16, { fit: 'inside' }).webp({ quality: 50 }).toBuffer(),
+    sharp(normalized).resize(800, 800, { fit: 'inside' }).webp({ quality: 90 }).toBuffer(),
+    sharp(normalized).resize(16, 16, { fit: 'inside' }).webp({ quality: 60 }).toBuffer(),
   ])
 
   const store = storage()

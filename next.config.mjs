@@ -25,6 +25,11 @@ const nextConfig = {
     remotePatterns: [
       // Tile server for the Leaflet/OpenStreetMap map views.
       { protocol: 'https', hostname: '*.tile.openstreetmap.org' },
+      // Cloudinary CDN
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
+      { protocol: 'https', hostname: '*.cloudinary.com' },
+      // AWS S3
+      { protocol: 'https', hostname: '*.amazonaws.com' },
     ],
   },
   async headers() {

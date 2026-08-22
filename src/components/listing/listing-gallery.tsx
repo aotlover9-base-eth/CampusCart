@@ -226,15 +226,17 @@ function GalleryImage({
     setHasError(false)
   }, [active.url])
 
+  const isCdn = imgSrc.startsWith('http://') || imgSrc.startsWith('https://')
+
   function handleError() {
-    if (active.blurDataUrl && imgSrc !== active.blurDataUrl) {
-      setImgSrc(active.blurDataUrl)
+    if (active.url && imgSrc !== active.url) {
+      setImgSrc(active.url)
     } else {
       setHasError(true)
     }
   }
 
-  if (hasError && !active.blurDataUrl) {
+  if (hasError) {
     return <MediaFallback className="h-full w-full" />
   }
 
@@ -251,6 +253,7 @@ function GalleryImage({
         fill
         sizes="(max-width: 1024px) 100vw, 720px"
         priority
+        unoptimized={isCdn}
         placeholder={active.blurDataUrl ? 'blur' : 'empty'}
         blurDataURL={active.blurDataUrl ?? undefined}
         onError={handleError}

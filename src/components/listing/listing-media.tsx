@@ -83,16 +83,18 @@ export function ListingMedia({
     setHasError(false)
   }, [item.url])
 
+  const isCdn = imgSrc.startsWith('http://') || imgSrc.startsWith('https://')
+
   function handleError() {
-    if (item.blurDataUrl && imgSrc !== item.blurDataUrl) {
-      setImgSrc(item.blurDataUrl)
-      setLoaded(true)
+    // If CDN fails, attempt high-res url before marking error - never fallback to low-res blurDataUrl!
+    if (item.url && imgSrc !== item.url) {
+      setImgSrc(item.url)
     } else {
       setHasError(true)
     }
   }
 
-  if (hasError && !item.blurDataUrl) {
+  if (hasError) {
     return <MediaFallback className="h-full w-full" />
   }
 
@@ -127,6 +129,7 @@ export function ListingMedia({
               alt=""
               fill
               sizes={sizes}
+              unoptimized={item.thumbnailUrl.startsWith('http')}
               className="object-cover"
               aria-hidden="true"
             />
@@ -169,6 +172,7 @@ export function ListingMedia({
           fill
           sizes={sizes}
           priority={priority}
+          unoptimized={isCdn}
           loading={priority ? undefined : 'lazy'}
           placeholder={item.blurDataUrl ? 'blur' : 'empty'}
           blurDataURL={item.blurDataUrl ?? undefined}
